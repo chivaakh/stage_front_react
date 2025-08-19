@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../contexts/AuthContext';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,7 +11,7 @@ const Login = () => {
   const location = useLocation();
 
   const {
-    register,
+    register, 
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
@@ -60,15 +60,53 @@ const Login = () => {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ textAlign: 'center' }}>
-          <div className="spinner-mauritanian" style={{ margin: '0 auto' }}></div>
-          <p style={{ marginTop: '1rem', color: '#6c757d' }}>Chargement...</p>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '1.5rem',
+          padding: '3rem',
+          textAlign: 'center',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e2e8f0'
+        }}>
+          <div style={{
+            width: '3rem',
+            height: '3rem',
+            border: '3px solid #e5e7eb',
+            borderTop: '3px solid #059669',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1.5rem'
+          }}></div>
+          <h3 style={{
+            color: '#059669',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '0.5rem'
+          }}>
+            Initialisation du système
+          </h3>
+          <p style={{
+            color: '#6b7280',
+            margin: 0,
+            fontSize: '0.95rem'
+          }}>
+            Chargement de l'interface sécurisée...
+          </p>
         </div>
+        
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -76,335 +114,643 @@ const Login = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 30%, #FFC107 50%, #4CAF50 70%, #2E7D32 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem 1rem'
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Motifs d'arrière-plan simples */}
       <div style={{
-        width: '100%',
-        maxWidth: '480px',
-        background: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
-        overflow: 'hidden',
-        border: '3px solid #FFC107'
-      }}>
-        {/* Header avec logo */}
-        <div style={{
-          textAlign: 'center',
-          padding: '3rem 2.5rem 2rem 2.5rem',
-          background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
-          borderBottom: '4px solid #FFC107'
-        }}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <img 
-              src="/images/logo-rim.png" 
-              alt="République Islamique de Mauritanie" 
-              style={{
-                width: '90px',
-                height: '90px',
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'block',
-                border: '4px solid #FFC107',
-                borderRadius: '50%',
-                background: 'white',
-                padding: '8px'
-              }}
-            />
-          </div>
-          
-          <h1 style={{
-            fontSize: '1.75rem',
-            fontWeight: '700',
-            color: 'white',
-            margin: '0 0 0.5rem 0',
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-          }}>
-            MESRS
-          </h1>
-          
-          <p style={{
-            fontSize: '1rem',
-            fontWeight: '600',
-            color: '#FFC107',
-            margin: '0 0 0.5rem 0'
-          }}>
-            République Islamique de Mauritanie
-          </p>
-          
-          <p style={{
-            fontSize: '0.875rem',
-            color: '#E8F5E8',
-            margin: 0
-          }}>
-            Système de Gestion des Ressources Humaines
-          </p>
-        </div>
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        width: '100px',
+        height: '100px',
+        background: 'rgba(5, 150, 105, 0.1)',
+        borderRadius: '50%'
+      }}></div>
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        right: '8%',
+        width: '80px',
+        height: '80px',
+        background: 'rgba(107, 114, 128, 0.1)',
+        borderRadius: '50%'
+      }}></div>
 
-        {/* Titre Connexion */}
+      {/* Header moderne */}
+      <header style={{
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+        padding: '1.5rem 0',
+        position: 'relative',
+        zIndex: 10
+      }}>
         <div style={{
-          textAlign: 'center',
-          padding: '0 2.5rem 1.5rem 2.5rem',
-          background: 'white'
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            marginBottom: '1rem'
+            gap: '2rem'
           }}>
-            <LockClosedIcon style={{ width: '1.5rem', height: '1.5rem', color: '#2E7D32' }} />
-            <h2 style={{
-              fontSize: '1.4rem',
-              fontWeight: '600',
-              color: '#2E7D32',
-              margin: 0
+            <div style={{
+              width: '70px',
+              height: '70px',
+              background: 'white',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              border: '2px solid #e2e8f0'
             }}>
-              Connexion Sécurisée
-            </h2>
-          </div>
-          <p style={{
-            fontSize: '0.875rem',
-            color: '#6c757d',
-            margin: 0,
-            fontStyle: 'italic'
-          }}>
-            Honneur - Fraternité - Justice
-          </p>
-        </div>
-
-        {/* Formulaire */}
-        <div style={{ padding: '0 2.5rem 2.5rem 2.5rem' }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Erreur générale */}
-            {errors.root && (
-              <div style={{
-                background: '#f8d7da',
-                color: '#721c24',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                marginBottom: '1rem',
-                fontSize: '0.875rem',
-                textAlign: 'center',
-                border: '1px solid #f5c6cb'
-              }}>
-                {errors.root.message}
-              </div>
-            )}
-
-            {/* Nom d'utilisateur */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                color: '#2E7D32',
-                marginBottom: '0.5rem'
-              }}>
-                Nom d'utilisateur
-              </label>
-              <input
-                type="text"
-                autoComplete="username"
+              <img 
+                src="/images/logo-rim.png" 
+                alt="Logo République Islamique de Mauritanie" 
                 style={{
-                  width: '100%',
-                  padding: '1.1rem 1.2rem',
-                  border: errors.username ? '2px solid #dc3545' : '2px solid #e9ecef',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  backgroundColor: errors.username ? '#f8d7da' : '#f8f9fa',
-                  transition: 'all 0.3s ease',
-                  outline: 'none'
+                  width: '45px',
+                  height: '45px',
+                  objectFit: 'contain'
                 }}
-                placeholder="Entrez votre nom d'utilisateur"
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#4CAF50';
-                  e.target.style.backgroundColor = 'white';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(76, 175, 80, 0.15)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = errors.username ? '#dc3545' : '#e9ecef';
-                  e.target.style.backgroundColor = errors.username ? '#f8d7da' : '#f8f9fa';
-                  e.target.style.boxShadow = 'none';
-                }}
-                {...register('username', {
-                  required: 'Le nom d\'utilisateur est requis',
-                  minLength: {
-                    value: 3,
-                    message: 'Minimum 3 caractères requis',
-                  },
-                })}
               />
-              {errors.username && (
-                <p style={{
-                  marginTop: '0.5rem',
-                  fontSize: '0.8rem',
-                  color: '#dc3545'
-                }}>
-                  {errors.username.message}
-                </p>
-              )}
             </div>
-
-            {/* Mot de passe */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                color: '#2E7D32',
-                marginBottom: '0.5rem'
-              }}>
-                Mot de passe
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  style={{
-                    width: '100%',
-                    padding: '1.1rem 1.2rem',
-                    paddingRight: '3.5rem',
-                    border: errors.password ? '2px solid #dc3545' : '2px solid #e9ecef',
-                    borderRadius: '12px',
-                    fontSize: '1rem',
-                    backgroundColor: errors.password ? '#f8d7da' : '#f8f9fa',
-                    transition: 'all 0.3s ease',
-                    outline: 'none'
-                  }}
-                  placeholder="Entrez votre mot de passe"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#4CAF50';
-                    e.target.style.backgroundColor = 'white';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(76, 175, 80, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = errors.password ? '#dc3545' : '#e9ecef';
-                    e.target.style.backgroundColor = errors.password ? '#f8d7da' : '#f8f9fa';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                  {...register('password', {
-                    required: 'Le mot de passe est requis',
-                    minLength: {
-                      value: 6,
-                      message: 'Minimum 6 caractères requis',
-                    },
-                  })}
-                />
-                <button
-                  type="button"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    right: '1.2rem',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#6c757d',
-                    padding: '0.25rem'
-                  }}
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon style={{ width: '1.25rem', height: '1.25rem' }} />
-                  ) : (
-                    <EyeIcon style={{ width: '1.25rem', height: '1.25rem' }} />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p style={{
-                  marginTop: '0.5rem',
-                  fontSize: '0.8rem',
-                  color: '#dc3545'
-                }}>
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            {/* Bouton de connexion */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              style={{
-                width: '100%',
-                padding: '1.2rem',
-                background: isSubmitting 
-                  ? 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)' 
-                  : 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)',
-                color: 'white',
-                border: isSubmitting ? 'none' : '2px solid #FFC107',
-                borderRadius: '12px',
-                fontSize: '1.1rem',
+            
+            <div>
+              <h1 style={{
+                fontSize: '1.4rem',
                 fontWeight: '700',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                transform: isSubmitting ? 'none' : 'translateY(0)',
-                boxShadow: isSubmitting ? 'none' : '0 4px 15px rgba(76, 175, 80, 0.4)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}
-              onMouseEnter={(e) => {
-                if (!isSubmitting) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 6px 25px rgba(76, 175, 80, 0.5)';
-                  e.target.style.background = 'linear-gradient(135deg, #66BB6A 0%, #388E3C 100%)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSubmitting) {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.4)';
-                  e.target.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)';
-                }
-              }}
-            >
-              {isSubmitting ? (
+                color: '#1e293b',
+                margin: '0 0 0.25rem 0',
+                letterSpacing: '-0.025em'
+              }}>
+                RÉPUBLIQUE ISLAMIQUE DE MAURITANIE
+              </h1>
+              <p style={{
+                fontSize: '0.85rem',
+                color: '#64748b',
+                margin: '0 0 0.25rem 0',
+                fontWeight: '500'
+              }}>
+                Honneur - Fraternité - Justice
+              </p>
+              <p style={{
+                fontSize: '0.95rem',
+                color: '#059669',
+                margin: 0,
+                fontWeight: '600'
+              }}>
+                Système de Gestion des Ressources Humaines
+              </p>
+            </div>
+          </div>
+          
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <div style={{
+              padding: '0.75rem 1.5rem',
+              background: '#f0fdf4',
+              borderRadius: '50px',
+              color: '#059669',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              border: '1px solid #bbf7d0'
+            }}>
+              Ministère de l'Enseignement Supérieur
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Contenu principal centré */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 100px)',
+        padding: '0.75rem',
+        position: 'relative',
+        zIndex: 5
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1.5rem',
+          maxWidth: '800px',
+          width: '100%'
+        }}>
+          
+          {/* Section de bienvenue */}
+          <div style={{
+            flex: 1,
+            maxWidth: '380px'
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #e2e8f0',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Motif décoratif */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '80px',
+                height: '80px',
+                background: '#f0fdf4',
+                borderRadius: '50%',
+                transform: 'translate(50%, -50%)'
+              }}></div>
+              
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '0.75rem'
+                }}>
+                  <div style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    background: '#059669',
+                    borderRadius: '0.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 4px rgba(5, 150, 105, 0.2)'
+                  }}>
+                    <UserGroupIcon style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                  </div>
+                  
+                  <div>
+                    <h2 style={{
+                      fontSize: '1.25rem',
+                      fontWeight: '700',
+                      color: '#1e293b',
+                      margin: '0 0 0.125rem 0',
+                      letterSpacing: '-0.025em'
+                    }}>
+                      MESRS
+                    </h2>
+                    <p style={{
+                      fontSize: '0.8rem',
+                      color: '#059669',
+                      margin: 0,
+                      fontWeight: '600'
+                    }}>
+                      Ministère de l'Enseignement Supérieur
+                    </p>
+                  </div>
+                </div>
+                
+                <h3 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  margin: '0 0 0.5rem 0',
+                  lineHeight: '1.3'
+                }}>
+                  Plateforme Intégrée de Gestion RH
+                </h3>
+                
+                <div style={{
+                  marginBottom: '0.75rem'
+                }}>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#4b5563',
+                    lineHeight: '1.3',
+                    margin: '0 0 0.375rem 0',
+                    textAlign: 'left'
+                  }}>
+                    <strong style={{ color: '#1f2937' }}>🇫🇷 Français :</strong><br />
+                    Système moderne et sécurisé pour la gestion des ressources humaines du personnel enseignant, administratif et contractuel
+                  </p>
+                  
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#4b5563',
+                    lineHeight: '1.3',
+                    margin: 0,
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    fontFamily: 'Arial, "Traditional Arabic", serif'
+                  }}>
+                    <strong style={{ color: '#1f2937' }}>🇲🇷 العربية :</strong><br />
+                    نظام حديث وآمن لإدارة الموارد البشرية للموظفين التعليميين والإداريين والمتعاقدين
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '0.375rem'
+                }}>
+                  {[
+                    { icon: '🎓', label: 'Enseignants', color: '#059669' },
+                    { icon: '👥', label: 'Personnel', color: '#6b7280' },
+                    { icon: '📋', label: 'Contractuels', color: '#7c3aed' }
+                  ].map((item, index) => (
+                    <div key={index} style={{
+                      padding: '0.375rem',
+                      background: '#f8fafc',
+                      borderRadius: '0.375rem',
+                      textAlign: 'center',
+                      border: '1px solid #e2e8f0',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      <div style={{
+                        fontSize: '0.875rem',
+                        marginBottom: '0.125rem'
+                      }}>
+                        {item.icon}
+                      </div>
+                      <p style={{
+                        fontSize: '0.625rem',
+                        fontWeight: '600',
+                        color: item.color,
+                        margin: 0
+                      }}>
+                        {item.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Formulaire de connexion */}
+          <div style={{
+            width: '300px',
+            flexShrink: 0
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '0.75rem',
+              boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden',
+              border: '1px solid #e2e8f0'
+            }}>
+              {/* Header du formulaire */}
+              <div style={{
+                background: '#059669',
+                padding: '1.5rem 1.25rem 1.25rem 1.25rem',
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                  opacity: 0.5
+                }}></div>
+                
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  background: 'white',
+                  borderRadius: '50%',
+                  margin: '0 auto 0.75rem auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  <img 
+                    src="/images/logo-rim.png" 
+                    alt="Logo" 
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      objectFit: 'contain'
+                    }}
+                  />
+                </div>
+                
+                <h2 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  margin: '0 0 0.5rem 0',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  Connexion Sécurisée
+                </h2>
+                
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.5rem'
+                  gap: '0.375rem',
+                  position: 'relative',
+                  zIndex: 1
                 }}>
-                  <div className="spinner-mauritanian" style={{ 
-                    width: '1rem', 
-                    height: '1rem',
-                    borderColor: '#ffffff40',
-                    borderTopColor: '#ffffff'
-                  }}></div>
-                  Connexion...
+                  <LockClosedIcon style={{ width: '0.875rem', height: '0.875rem', color: 'rgba(255, 255, 255, 0.9)' }} />
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    margin: 0,
+                    fontWeight: '500'
+                  }}>
+                    Accès aux données RH du ministère
+                  </p>
                 </div>
-              ) : (
-                '🔐 Se Connecter'
-              )}
-            </button>
-          </form>
-        </div>
+              </div>
 
-        {/* Footer */}
-        <div style={{
-          background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
-          color: 'white',
-          textAlign: 'center',
-          padding: '2rem 2.5rem',
-          fontSize: '0.85rem',
-          lineHeight: '1.5',
-          borderTop: '4px solid #FFC107'
-        }}>
-          <p style={{ margin: '0 0 0.5rem 0', fontWeight: '600' }}>
-            © 2024 République Islamique de Mauritanie
-          </p>
-          <p style={{ margin: 0, opacity: 0.95, fontSize: '0.8rem' }}>
-            Ministère de l'Enseignement Supérieur et de la Recherche Scientifique
-          </p>
+              {/* Formulaire */}
+              <div style={{ padding: '1.5rem 1.25rem' }}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  {/* Erreur générale */}
+                  {errors.root && (
+                    <div style={{
+                      background: '#fef2f2',
+                      color: '#dc2626',
+                      padding: '0.625rem',
+                      borderRadius: '0.375rem',
+                      marginBottom: '1rem',
+                      fontSize: '0.75rem',
+                      textAlign: 'center',
+                      border: '1px solid #fecaca'
+                    }}>
+                      {errors.root.message}
+                    </div>
+                  )}
+
+                  {/* Nom d'utilisateur */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      color: '#1f2937',
+                      marginBottom: '0.375rem'
+                    }}>
+                      Nom d'utilisateur
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        autoComplete="username"
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          border: errors.username ? '1px solid #dc2626' : '1px solid #d1d5db',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.875rem',
+                          backgroundColor: errors.username ? '#fef2f2' : 'white',
+                          transition: 'all 0.2s ease',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                        }}
+                        placeholder="Entrez votre nom d'utilisateur"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#059669';
+                          e.target.style.backgroundColor = 'white';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = errors.username ? '#dc2626' : '#d1d5db';
+                          e.target.style.backgroundColor = errors.username ? '#fef2f2' : 'white';
+                          e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                        }}
+                        {...register('username', {
+                          required: 'Le nom d\'utilisateur est requis',
+                          minLength: {
+                            value: 3,
+                            message: 'Minimum 3 caractères requis',
+                          },
+                        })}
+                      />
+                    </div>
+                    {errors.username && (
+                      <p style={{
+                        marginTop: '0.5rem',
+                        fontSize: '0.8rem',
+                        color: '#dc2626',
+                        fontWeight: '500'
+                      }}>
+                        {errors.username.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Mot de passe */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      color: '#1f2937',
+                      marginBottom: '0.5rem'
+                    }}>
+                      Mot de passe
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          paddingRight: '2.75rem',
+                          border: errors.password ? '1px solid #dc2626' : '1px solid #d1d5db',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.875rem',
+                          backgroundColor: errors.password ? '#fef2f2' : 'white',
+                          transition: 'all 0.2s ease',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                        }}
+                        placeholder="Entrez votre mot de passe"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#059669';
+                          e.target.style.backgroundColor = 'white';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = errors.password ? '#dc2626' : '#d1d5db';
+                          e.target.style.backgroundColor = errors.password ? '#fef2f2' : 'white';
+                          e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                        }}
+                        {...register('password', {
+                          required: 'Le mot de passe est requis',
+                          minLength: {
+                            value: 6,
+                            message: 'Minimum 6 caractères requis',
+                          },
+                        })}
+                      />
+                      <button
+                        type="button"
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          right: '1rem',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#6b7280',
+                          padding: '0.25rem',
+                          borderRadius: '0.25rem',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={togglePasswordVisibility}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#f3f4f6';
+                          e.target.style.color = '#374151';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'transparent';
+                          e.target.style.color = '#6b7280';
+                        }}
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon style={{ width: '1.125rem', height: '1.125rem' }} />
+                        ) : (
+                          <EyeIcon style={{ width: '1.125rem', height: '1.125rem' }} />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p style={{
+                        marginTop: '0.5rem',
+                        fontSize: '0.8rem',
+                        color: '#dc2626',
+                        fontWeight: '500'
+                      }}>
+                        {errors.password.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Bouton de connexion */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    style={{
+                      width: '100%',
+                      padding: '1rem',
+                      background: isSubmitting 
+                        ? '#9ca3af' 
+                        : '#059669',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '0.75rem',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.75rem',
+                      boxShadow: isSubmitting 
+                        ? 'none' 
+                        : '0 4px 12px rgba(5, 150, 105, 0.3)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.025em'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSubmitting) {
+                        e.target.style.background = '#047857';
+                        e.target.style.transform = 'translateY(-1px)';
+                        e.target.style.boxShadow = '0 6px 16px rgba(5, 150, 105, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSubmitting) {
+                        e.target.style.background = '#059669';
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.3)';
+                      }
+                    }}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div                         style={{ 
+                          width: '1rem', 
+                          height: '1rem',
+                          border: '2px solid rgba(255,255,255,0.3)',
+                          borderTop: '2px solid #ffffff',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }}></div>
+                        Connexion...
+                      </>
+                    ) : (
+                      <>
+                        <LockClosedIcon style={{ width: '1rem', height: '1rem' }} />
+                        SE CONNECTER
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Footer du formulaire */}
+              <div style={{
+                background: '#f8fafc',
+                color: '#64748b',
+                textAlign: 'center',
+                padding: '1rem',
+                borderTop: '1px solid #e2e8f0'
+              }}>
+                <p style={{ 
+                  margin: '0 0 0.125rem 0', 
+                  fontWeight: '600',
+                  fontSize: '0.75rem',
+                  color: '#374151'
+                }}>
+                  © 2024 République Islamique de Mauritanie
+                </p>
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: '0.7rem',
+                  fontWeight: '400'
+                }}>
+                  Ministère de l'Enseignement Supérieur et de la Recherche Scientifique
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Styles CSS pour les animations */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
