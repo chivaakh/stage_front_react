@@ -1,4 +1,4 @@
-// src/services/api.js - VERSION UNIFIÉE ET CORRIGÉE
+// src/services/api.js - VERSION FINALE CORRIGÉE
 import axios from 'axios';
 
 // Configuration de base
@@ -317,6 +317,78 @@ export const apiService = {
     }
   },
 
+  // ===== PERSONNEL PAT (NOUVELLES MÉTHODES) =====
+  async getPersonnelPAT(params = {}) {
+    try {
+      console.log('🏢 Récupération du personnel PAT avec params:', params);
+      const response = await api.get('/personnel-pat/', { params });
+      console.log('✅ Personnel PAT récupéré:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getPersonnelPAT:', error);
+      throw error;
+    }
+  },
+
+  async getPersonnelPATById(id) {
+    try {
+      console.log('👁️ Récupération agent PAT ID:', id);
+      const response = await api.get(`/personnel-pat/${id}/`);
+      console.log('✅ Agent PAT récupéré:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getPersonnelPATById:', error);
+      throw error;
+    }
+  },
+
+  async createPersonnelPAT(patData) {
+    try {
+      console.log('➕ Création nouvel agent PAT:', patData);
+      const response = await api.post('/personnel-pat/', patData);
+      console.log('✅ Agent PAT créé:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createPersonnelPAT:', error);
+      throw error;
+    }
+  },
+
+  async updatePersonnelPAT(id, patData) {
+    try {
+      console.log('✏️ Modification agent PAT ID:', id, patData);
+      const response = await api.put(`/personnel-pat/${id}/`, patData);
+      console.log('✅ Agent PAT modifié:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur updatePersonnelPAT:', error);
+      throw error;
+    }
+  },
+
+  async deletePersonnelPAT(id) {
+    try {
+      console.log('🗑️ Suppression agent PAT ID:', id);
+      const response = await api.delete(`/personnel-pat/${id}/`);
+      console.log('✅ Agent PAT supprimé');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur deletePersonnelPAT:', error);
+      throw error;
+    }
+  },
+
+  async getPersonnelPATParPoste() {
+    try {
+      console.log('📊 Récupération stats PAT par poste');
+      const response = await api.get('/personnel-pat/par_poste/');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getPersonnelPATParPoste:', error);
+      throw error;
+    }
+  },
+
   // ===== ABSENCES =====
   async getAbsences(params = {}) {
     try {
@@ -377,7 +449,7 @@ export const apiService = {
     }
   },
 
-  // ===== GESTION DES ABSENCES POUR CHEF =====
+  // ===== GESTION DES ABSENCES POUR CHEF (CORRIGÉES) =====
   async getAbsencesEnAttenteApprobation() {
     try {
       console.log('⏰ Récupération absences en attente d\'approbation');
@@ -393,7 +465,7 @@ export const apiService = {
         return fallbackResponse.data;
       } catch (fallbackError) {
         console.error('❌ Erreur fallback:', fallbackError);
-        throw error; // Lancer l'erreur originale
+        throw error;
       }
     }
   },
@@ -401,11 +473,26 @@ export const apiService = {
   async approuverAbsence(absenceId, commentaire = '') {
     try {
       console.log('✅ Approbation absence ID:', absenceId, 'Commentaire:', commentaire);
-      const response = await api.post(`/absences/${absenceId}/approuver/`, {
-        commentaire: commentaire || 'Approuvé par le chef de service'
-      });
-      console.log('✅ Absence approuvée avec succès:', response.data);
-      return response.data;
+      
+      // Tentative 1: Endpoint dédié approuver
+      try {
+        const response = await api.post(`/absences/${absenceId}/approuver/`, {
+          commentaire: commentaire || 'Approuvé par le chef de service'
+        });
+        console.log('✅ Absence approuvée avec succès (méthode 1):', response.data);
+        return response.data;
+      } catch (error1) {
+        console.log('🔄 Tentative méthode alternative...');
+        
+        // Tentative 2: Modification directe du statut
+        const response = await api.patch(`/absences/${absenceId}/`, {
+          statut: 'APPROUVÉ',
+          commentaire_approbateur: commentaire || 'Approuvé par le chef de service',
+          date_approbation: new Date().toISOString()
+        });
+        console.log('✅ Absence approuvée avec succès (méthode 2):', response.data);
+        return response.data;
+      }
     } catch (error) {
       console.error('❌ Erreur approuverAbsence:', error);
       throw error;
@@ -415,11 +502,26 @@ export const apiService = {
   async refuserAbsence(absenceId, motifRefus) {
     try {
       console.log('❌ Refus absence ID:', absenceId, 'Motif:', motifRefus);
-      const response = await api.post(`/absences/${absenceId}/refuser/`, {
-        motif_refus: motifRefus || 'Refusé par le chef de service'
-      });
-      console.log('❌ Absence refusée avec succès:', response.data);
-      return response.data;
+      
+      // Tentative 1: Endpoint dédié refuser
+      try {
+        const response = await api.post(`/absences/${absenceId}/refuser/`, {
+          motif_refus: motifRefus || 'Refusé par le chef de service'
+        });
+        console.log('❌ Absence refusée avec succès (méthode 1):', response.data);
+        return response.data;
+      } catch (error1) {
+        console.log('🔄 Tentative méthode alternative...');
+        
+        // Tentative 2: Modification directe du statut
+        const response = await api.patch(`/absences/${absenceId}/`, {
+          statut: 'REFUSÉ',
+          motif_refus: motifRefus || 'Refusé par le chef de service',
+          date_refus: new Date().toISOString()
+        });
+        console.log('❌ Absence refusée avec succès (méthode 2):', response.data);
+        return response.data;
+      }
     } catch (error) {
       console.error('❌ Erreur refuserAbsence:', error);
       throw error;
@@ -444,17 +546,6 @@ export const apiService = {
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getAbsencesStatistiques:', error);
-      throw error;
-    }
-  },
-
-  // ===== PERSONNEL PAT =====
-  async getPersonnelPAT(params = {}) {
-    try {
-      const response = await api.get('/personnel-pat/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('❌ Erreur getPersonnelPAT:', error);
       throw error;
     }
   },

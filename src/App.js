@@ -12,10 +12,15 @@ import Dashboard from './components/Dashboard/Dashboard';
 import LoadingSpinner from './components/Common/LoadingSpinner';
 import ErrorBoundary from './components/Common/ErrorBoundary';
 
-// Composants Chef Enseignant modernisés
+// Composants Chef Enseignant
 import EnseignantsList from './components/ChefEnseignant/EnseignantsList';
 import AbsencesManagement from './components/ChefEnseignant/AbsencesManagement';
 import ReportsManagement from './components/ChefEnseignant/ReportsManagement';
+
+// Composants Chef PAT (Personnel Administratif et Technique)
+import PATList from './components/ChefPAT/PATList';
+import AbsencesManagementPAT from './components/ChefPAT/AbsencesManagement';
+import ReportsManagementPAT from './components/ChefPAT/ReportsManagement';
 
 // Styles
 import './App.css';
@@ -211,7 +216,15 @@ const Navigation = ({ user }) => {
     );
   }
 
-  if (user?.role?.startsWith('chef_') && user?.role !== 'chef_enseignant') {
+  if (user?.role === 'chef_pat') {
+    navItems.push(
+      { href: '/chef-pat/personnel', label: 'الموظفون الإداريون', labelFr: 'Mon Personnel PAT' },
+      { href: '/chef-pat/absences', label: 'إدارة الغياب', labelFr: 'Gestion Absences' },
+      { href: '/chef-pat/rapports', label: 'التقارير', labelFr: 'Rapports' }
+    );
+  }
+
+  if (user?.role?.startsWith('chef_') && user?.role !== 'chef_enseignant' && user?.role !== 'chef_pat') {
     navItems.push(
       { href: '/mon-equipe', label: 'فريقي', labelFr: 'Mon Équipe' }
     );
@@ -337,6 +350,34 @@ const MainLayout = () => {
             }
           />
 
+          {/* Routes Chef PAT (Personnel Administratif et Technique) */}
+          <Route
+            path="/chef-pat/personnel"
+            element={
+              <ProtectedRoute requiredRole="chef_pat">
+                <PATList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chef-pat/absences"
+            element={
+              <ProtectedRoute requiredRole="chef_pat">
+                <AbsencesManagementPAT />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chef-pat/rapports"
+            element={
+              <ProtectedRoute requiredRole="chef_pat">
+                <ReportsManagementPAT />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Routes Admin RH */}
           <Route
             path="/users"
@@ -418,6 +459,16 @@ const MainLayout = () => {
                     actionText="الوصول إلى إدارة الغياب"
                     actionTextFr="Accéder à la Gestion des Absences"
                     actionLink="/chef-enseignant/absences"
+                    color="#10b981"
+                  />
+                ) : user?.role === 'chef_pat' ? (
+                  <OfficialSuccessCard
+                    titleAr="إدارة الغياب متاحة!"
+                    titleFr="Module disponible !"
+                    description="Votre module de gestion des absences PAT est fonctionnel."
+                    actionText="الوصول إلى إدارة الغياب"
+                    actionTextFr="Accéder à la Gestion des Absences"
+                    actionLink="/chef-pat/absences"
                     color="#10b981"
                   />
                 ) : (
