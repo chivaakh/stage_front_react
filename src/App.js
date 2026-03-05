@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 
 // Components existants
 import Login from './components/Auth/Login';
@@ -21,6 +22,23 @@ import ReportsManagement from './components/ChefEnseignant/ReportsManagement';
 import PATList from './components/ChefPAT/PATList';
 import AbsencesManagementPAT from './components/ChefPAT/AbsencesManagement';
 import ReportsManagementPAT from './components/ChefPAT/ReportsManagement';
+import ContractuelsList from './components/ChefContractuel/ContractuelsList';
+import AbsencesManagementContractuel from './components/ChefContractuel/AbsencesManagement';
+
+// Composants Admin RH
+import EnseignantsListAdminRH from './components/AdminRH/EnseignantsList';
+import PATListAdminRH from './components/AdminRH/PATList';
+import ContractuelsListAdminRH from './components/AdminRH/ContractuelsList';
+import ServicesList from './components/AdminRH/ServicesList';
+import PaiesList from './components/AdminRH/PaiesList';
+import AbsencesManagementAdminRH from './components/AdminRH/AbsencesManagementAdminRH';
+import RapportsAnalyses from './components/AdminRH/RapportsAnalyses';
+import UsersManagement from './components/AdminRH/UsersManagement';
+import PersonnelManagement from './components/AdminRH/PersonnelManagement';
+import MesAbsences from './components/Employe/MesAbsences';
+import ProfilEmploye from './components/Employe/ProfilEmploye';
+import MesDocuments from './components/Employe/MesDocuments';
+import OnboardingEmploye from './components/Employe/OnboardingEmploye';
 
 // Styles
 import './App.css';
@@ -38,6 +56,7 @@ const queryClient = new QueryClient({
 
 // Header mauritanien officiel épuré
 const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
+  const { isArabic, t, language, toggleLanguage } = useLanguage();
   return (
     <header style={{
       backgroundColor: 'white',
@@ -70,28 +89,20 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
               objectFit: 'contain'
             }}
           />
-          <div>
-            <div style={{
-              fontSize: '0.75rem',
-              color: '#6b7280',
-              fontWeight: '500',
-              marginBottom: '0.25rem'
-            }}>
-              الجمهورية الإسلامية الموريتانية
-            </div>
+          <div style={{ textAlign: isArabic ? 'right' : 'left', direction: isArabic ? 'rtl' : 'ltr' }}>
             <div style={{
               fontSize: '0.875rem',
               color: '#374151',
               fontWeight: '600'
             }}>
-              RÉPUBLIQUE ISLAMIQUE DE MAURITANIE
+              {t('bulletin.republique')}
             </div>
             <div style={{
               fontSize: '0.75rem',
               color: '#6b7280',
               fontWeight: '500'
             }}>
-              Honneur - Fraternité - Justice
+              {t('header.devise')}
             </div>
           </div>
         </div>
@@ -109,7 +120,7 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
             margin: 0,
             letterSpacing: '-0.025em'
           }}>
-            Système de Gestion des Ressources Humaines
+            {t('header.systemeGestionRH')}
           </h1>
           <p style={{
             fontSize: '0.875rem',
@@ -117,7 +128,7 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
             margin: '0.25rem 0 0 0',
             fontWeight: '500'
           }}>
-            Ministère de l'Enseignement Supérieur et de la Recherche Scientifique
+            {t('header.ministere')}
           </p>
         </div>
 
@@ -165,6 +176,35 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
             </span>
           </div>
 
+          {/* Bouton de traduction */}
+          <button
+            onClick={toggleLanguage}
+            style={{
+              backgroundColor: language === 'ar' ? '#3b82f6' : '#f3f4f6',
+              color: language === 'ar' ? 'white' : '#374151',
+              border: 'none',
+              borderRadius: '0.375rem',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              minWidth: '3rem'
+            }}
+            onMouseEnter={(e) => {
+              if (language === 'fr') {
+                e.target.style.backgroundColor = '#e5e7eb';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (language === 'fr') {
+                e.target.style.backgroundColor = '#f3f4f6';
+              }
+            }}
+          >
+            {language === 'fr' ? 'Ar' : 'Fr'}
+          </button>
+
           <button
             onClick={onLogout}
             style={{
@@ -185,7 +225,7 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
               e.target.style.backgroundColor = '#ef4444';
             }}
           >
-           Déconnexion
+           {t('nav.deconnexion')}
           </button>
         </div>
       </div>
@@ -195,44 +235,57 @@ const MauritanianHeader = ({ user, userName, userRole, onLogout }) => {
 
 // Navigation horizontale épurée
 const Navigation = ({ user }) => {
+  const { language, isArabic, t } = useLanguage();
+  
   const navItems = [
-    { href: '/dashboard', label: 'الرئيسية', labelFr: 'Accueil', active: true },
+    { href: '/dashboard', labelFr: 'Accueil', labelAr: 'الرئيسية', active: true },
   ];
 
   // Ajouter items selon le rôle
   if (user?.role === 'admin_rh') {
     navItems.push(
-      { href: '/users', label: 'المستخدمون', labelFr: 'Utilisateurs' },
-      { href: '/services', label: 'الخدمات', labelFr: 'Services' },
-      { href: '/personnes', label: 'الموظفون', labelFr: 'Personnel' }
+      { href: '/users', labelFr: 'Utilisateurs', labelAr: 'المستخدمون' },
+      { href: '/services', labelFr: 'Services', labelAr: 'الخدمات' },
+      { href: '/personnes', labelFr: 'Personnel', labelAr: 'الموظفون' },
+      { href: '/admin-rh/absences', labelFr: 'Absences', labelAr: 'إدارة الغياب' },
+      { href: '/admin-rh/paies', labelFr: 'Paies', labelAr: 'الرواتب' }
     );
   }
 
   if (user?.role === 'chef_enseignant') {
     navItems.push(
-      { href: '/chef-enseignant/enseignants', label: 'المدرسون', labelFr: 'Mes Enseignants' },
-      { href: '/chef-enseignant/absences', label: 'إدارة الغياب', labelFr: 'Gestion Absences' },
-      { href: '/chef-enseignant/rapports', label: 'التقارير', labelFr: 'Rapports' }
+      { href: '/chef-enseignant/enseignants', labelFr: 'Mes Enseignants', labelAr: 'المدرسون' },
+      { href: '/chef-enseignant/absences', labelFr: 'Gestion Absences', labelAr: 'إدارة الغياب' },
+      { href: '/chef-enseignant/rapports', labelFr: 'Rapports', labelAr: 'التقارير' }
     );
   }
 
   if (user?.role === 'chef_pat') {
     navItems.push(
-      { href: '/chef-pat/personnel', label: 'الموظفون الإداريون', labelFr: 'Mon Personnel PAT' },
-      { href: '/chef-pat/absences', label: 'إدارة الغياب', labelFr: 'Gestion Absences' },
-      { href: '/chef-pat/rapports', label: 'التقارير', labelFr: 'Rapports' }
+      { href: '/chef-pat/personnel', labelFr: 'Mon Personnel PAT', labelAr: 'الموظفون الإداريون' },
+      { href: '/chef-pat/absences', labelFr: 'Gestion Absences', labelAr: 'إدارة الغياب' },
+      { href: '/chef-pat/rapports', labelFr: 'Rapports', labelAr: 'التقارير' }
     );
   }
 
-  if (user?.role?.startsWith('chef_') && user?.role !== 'chef_enseignant' && user?.role !== 'chef_pat') {
+  if (user?.role === 'chef_contractuel') {
     navItems.push(
-      { href: '/mon-equipe', label: 'فريقي', labelFr: 'Mon Équipe' }
+      { href: '/chef-contractuel/personnel', labelFr: 'Mes Contractuels', labelAr: 'المتعاقدون' },
+      { href: '/chef-contractuel/absences', labelFr: 'Gestion Absences', labelAr: 'إدارة الغياب' }
+    );
+  }
+
+  if (user?.role?.startsWith('chef_') && user?.role !== 'chef_enseignant' && user?.role !== 'chef_pat' && user?.role !== 'chef_contractuel') {
+    navItems.push(
+      { href: '/mon-equipe', labelFr: 'Mon Équipe', labelAr: 'فريقي' }
     );
   }
 
   if (user?.role === 'employe') {
     navItems.push(
-      { href: '/mes-absences', label: 'غياباتي', labelFr: 'Mes Absences' }
+      { href: '/profil', labelFr: 'Mon Profil', labelAr: 'ملفي' },
+      { href: '/mes-absences', labelFr: 'Mes Absences', labelAr: 'غياباتي' },
+      { href: '/mes-documents', labelFr: 'Mes Documents', labelAr: 'وثائقي' }
     );
   }
 
@@ -240,7 +293,8 @@ const Navigation = ({ user }) => {
     <nav style={{
       backgroundColor: 'white',
       borderBottom: '1px solid #e5e7eb',
-      padding: '0 2rem'
+      padding: '0 2rem',
+      direction: isArabic ? 'rtl' : 'ltr'
     }}>
       <div style={{
         maxWidth: '1400px',
@@ -257,10 +311,6 @@ const Navigation = ({ user }) => {
               key={index}
               href={item.href}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.25rem',
                 padding: '1rem 0',
                 textDecoration: 'none',
                 borderBottom: isActive ? '2px solid #059669' : '2px solid transparent',
@@ -280,8 +330,7 @@ const Navigation = ({ user }) => {
                 }
               }}
             >
-              <span style={{ fontSize: '0.75rem' }}>{item.label}</span>
-              <span>{item.labelFr}</span>
+              {isArabic ? item.labelAr : item.labelFr}
             </a>
           );
         })}
@@ -378,20 +427,104 @@ const MainLayout = () => {
             }
           />
 
+          {/* Routes Chef Contractuel */}
+          <Route
+            path="/chef-contractuel/personnel"
+            element={
+              <ProtectedRoute requiredRole="chef_contractuel">
+                <ContractuelsList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chef-contractuel/absences"
+            element={
+              <ProtectedRoute requiredRole="chef_contractuel">
+                <AbsencesManagementContractuel />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Routes Admin RH */}
+          <Route
+            path="/admin-rh/enseignants"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <EnseignantsListAdminRH />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/personnel-pat"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <PATListAdminRH />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/contractuels"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <ContractuelsListAdminRH />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/services"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <ServicesList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/users"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <UsersManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/absences"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <AbsencesManagementAdminRH />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/paies"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <PaiesList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-rh/rapports"
+            element={
+              <ProtectedRoute requiredRole="admin_rh">
+                <RapportsAnalyses />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Routes Admin RH - Anciennes routes pour compatibilité */}
           <Route
             path="/users"
             element={
               <ProtectedRoute requiredRole="admin_rh">
-                <OfficialModuleCard
-                  titleAr="إدارة المستخدمين"
-                  titleFr="Gestion des Utilisateurs"
-                  description="Ce module permettra de gérer les comptes utilisateurs du système MESRS."
-                  icon="👥"
-                  color="#3b82f6"
-                  count="4"
-                  unit="utilisateurs"
-                />
+                <UsersManagement />
               </ProtectedRoute>
             }
           />
@@ -400,15 +533,7 @@ const MainLayout = () => {
             path="/services"
             element={
               <ProtectedRoute requiredRole="admin_rh">
-                <OfficialModuleCard
-                  titleAr="إدارة الخدمات"
-                  titleFr="Gestion des Services"
-                  description="Ce module permettra de gérer les services du ministère."
-                  icon="🏢"
-                  color="#059669"
-                  count="12"
-                  unit="services"
-                />
+                <ServicesList />
               </ProtectedRoute>
             }
           />
@@ -417,15 +542,7 @@ const MainLayout = () => {
             path="/personnes"
             element={
               <ProtectedRoute requiredRole="admin_rh">
-                <OfficialModuleCard
-                  titleAr="إدارة الموظفين"
-                  titleFr="Gestion du Personnel"
-                  description="Ce module permettra de gérer les dossiers du personnel."
-                  icon="👤"
-                  color="#7c3aed"
-                  count="247"
-                  unit="employés"
-                />
+                <PersonnelManagement />
               </ProtectedRoute>
             }
           />
@@ -489,30 +606,18 @@ const MainLayout = () => {
           <Route
             path="/mes-absences"
             element={
-              <OfficialModuleCard
-                titleAr="غياباتي"
-                titleFr="Mes Absences"
-                description="Ce module permettra de gérer vos demandes d'absence."
-                icon="📋"
-                color="#8b5cf6"
-                count="3"
-                unit="demandes"
-              />
+              <ProtectedRoute>
+                <MesAbsences />
+              </ProtectedRoute>
             }
           />
 
           <Route
             path="/profil"
             element={
-              <OfficialModuleCard
-                titleAr="ملفي الشخصي"
-                titleFr="Mon Profil"
-                description="Ce module permettra de voir et modifier votre profil."
-                icon="👤"
-                color="#06b6d4"
-                count="1"
-                unit="profil"
-              />
+              <ProtectedRoute>
+                <ProfilEmploye />
+              </ProtectedRoute>
             }
           />
 
@@ -534,15 +639,19 @@ const MainLayout = () => {
           <Route
             path="/mes-documents"
             element={
-              <OfficialModuleCard
-                titleAr="وثائقي"
-                titleFr="Mes Documents"
-                description="Ce module permettra d'accéder à vos documents personnels."
-                icon="📄"
-                color="#f97316"
-                count="12"
-                unit="documents"
-              />
+              <ProtectedRoute>
+                <MesDocuments />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Route onboarding employé */}
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute requiredRole="employe">
+                <OnboardingEmploye />
+              </ProtectedRoute>
             }
           />
 
@@ -968,17 +1077,18 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <div className="App">
-            <AppContent />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  backgroundColor: 'white',
-                  color: '#374151',
-                  border: '1px solid #e5e7eb',
+        <LanguageProvider>
+          <AuthProvider>
+            <div className="App">
+              <AppContent />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    backgroundColor: 'white',
+                    color: '#374151',
+                    border: '1px solid #e5e7eb',
                   borderRadius: '0.5rem',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                 },
@@ -997,7 +1107,8 @@ function App() {
               }}
             />
           </div>
-        </AuthProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

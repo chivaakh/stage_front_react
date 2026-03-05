@@ -6,8 +6,9 @@ import {
   DocumentTextIcon,
   CurrencyDollarIcon,
   BuildingOfficeIcon,
-  CalendarDaysIcon,
+  CalendarDaysIcon
 } from '@heroicons/react/24/outline';
+
 
 const EmployeDashboard = ({ data }) => {
   const profil = data?.profil || {};

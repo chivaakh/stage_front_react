@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   HomeIcon,
   AcademicCapIcon,
@@ -24,6 +25,7 @@ import {
 
 const Navigation = ({ children }) => {
   const { user, logout } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
@@ -46,10 +48,12 @@ const Navigation = ({ children }) => {
 
     const roleSpecificItems = {
       admin_rh: [
-        { name: 'Tous les Services', href: '/admin/services', icon: BuildingOfficeIcon },
-        { name: 'Utilisateurs', href: '/admin/users', icon: UsersIcon },
-        { name: 'Rapports Globaux', href: '/admin/reports', icon: ChartBarIcon },
-        { name: 'Configuration', href: '/admin/settings', icon: Cog6ToothIcon }
+        { name: 'Enseignants', href: '/admin-rh/enseignants', icon: AcademicCapIcon },
+        { name: 'Personnel PAT', href: '/admin-rh/personnel-pat', icon: UsersIcon },
+        { name: 'Contractuels', href: '/admin-rh/contractuels', icon: DocumentTextIcon },
+        { name: 'Services', href: '/admin-rh/services', icon: BuildingOfficeIcon },
+        { name: 'Utilisateurs', href: '/admin-rh/users', icon: UsersIcon },
+        { name: 'Absences', href: '/admin-rh/absences', icon: ClockIcon }
       ],
       chef_enseignant: [
         { name: 'Mes Enseignants', href: '/chef-enseignant/enseignants', icon: AcademicCapIcon },
@@ -261,8 +265,40 @@ const Navigation = ({ children }) => {
           </ul>
         </nav>
 
-        {/* Bouton de déconnexion */}
+        {/* Bouton de bascule de langue et déconnexion */}
         <div style={{ padding: '1rem', borderTop: '1px solid #e5e7eb' }}>
+          <button
+            onClick={toggleLanguage}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              width: '100%',
+              backgroundColor: language === 'ar' ? '#3b82f6' : '#f3f4f6',
+              border: 'none',
+              borderRadius: '0.5rem',
+              color: language === 'ar' ? 'white' : '#374151',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              marginBottom: '0.5rem'
+            }}
+            onMouseEnter={(e) => {
+              if (language === 'fr') {
+                e.target.style.backgroundColor = '#e5e7eb';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (language === 'fr') {
+                e.target.style.backgroundColor = '#f3f4f6';
+              }
+            }}
+          >
+            {language === 'fr' ? 'Ar' : 'Fr'}
+          </button>
           <button
             onClick={handleLogout}
             style={{

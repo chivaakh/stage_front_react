@@ -1,4 +1,6 @@
+// Traduit automatiquement
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import {
@@ -17,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
+  const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -190,7 +193,7 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
     } catch (err) {
       console.error('❌ Erreur création enseignant:', err);
       
-      let errorMessage = 'Erreur lors de la création';
+      let errorMessage = 'Erreur lors de la création de l\'enseignant';
       
       if (err.response?.data) {
         if (typeof err.response.data === 'object') {
@@ -955,9 +958,7 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
                     fontWeight: '600',
                     color: '#374151',
                     marginBottom: '0.5rem'
-                  }}>
-                    Adresse
-                  </label>
+                  }}>{t('common.adresse')}</label>
                   <input
                     type="text"
                     name="adresse"
@@ -1376,9 +1377,7 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
                     e.target.style.boxShadow = '0 4px 6px -1px rgba(100, 116, 139, 0.3)';
                   }}
                 >
-                  <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-                  Précédent
-                </button>
+                  <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.precedent')}</button>
               )}
             </div>
 
@@ -1399,7 +1398,7 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
                   style={{
                     padding: '0.75rem 1.5rem',
                     background: validateStep(currentStep)
-                      ? `linear-gradient(135deg, ${currentStepConfig.color} 0%, ${currentStepConfig.color}dd 100%)`
+                      ? 'linear-gradient(135deg, ${currentStepConfig.color} 0%, ${currentStepConfig.color}dd 100%)'
                       : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
                     color: 'white',
                     border: 'none',
@@ -1412,24 +1411,22 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
                     alignItems: 'center',
                     gap: '0.5rem',
                     boxShadow: validateStep(currentStep)
-                      ? `0 4px 6px -1px ${currentStepConfig.color}40`
+                      ? '0 4px 6px -1px ${currentStepConfig.color}40'
                       : '0 4px 6px -1px rgba(156, 163, 175, 0.3)'
                   }}
                   onMouseEnter={(e) => {
                     if (validateStep(currentStep)) {
                       e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = `0 8px 15px -3px ${currentStepConfig.color}60`;
+                      e.target.style.boxShadow = '0 8px 15px -3px ${currentStepConfig.color}60';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (validateStep(currentStep)) {
                       e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = `0 4px 6px -1px ${currentStepConfig.color}40`;
+                      e.target.style.boxShadow = '0 4px 6px -1px ${currentStepConfig.color}40';
                     }
                   }}
-                >
-                  Suivant
-                  <ArrowLeftIcon style={{
+                >{t('common.suivant')}<ArrowLeftIcon style={{
                     width: '1rem',
                     height: '1rem',
                     transform: 'rotate(180deg)'
@@ -1497,7 +1494,7 @@ const CreateEnseignantForm = ({ onCancel, onSuccess }) => {
         </div>
       </div>
       
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }

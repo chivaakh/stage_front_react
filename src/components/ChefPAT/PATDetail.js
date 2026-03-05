@@ -1,7 +1,9 @@
+// Traduit automatiquement
 // src/components/ChefPAT/PATDetail.js - VUE DÉTAILLÉE PAT (VERSION FINALE CORRIGÉE)
 import React from 'react';
-
+import { useLanguage } from '../../contexts/LanguageContext';
 const PATDetail = ({ pat, onClose, onEdit }) => {
+  const { t, isArabic } = useLanguage();
   
   // Vérification de sécurité
   if (!pat) {
@@ -899,9 +901,7 @@ const PATDetail = ({ pat, onClose, onEdit }) => {
                 e.target.style.backgroundColor = '#f3f4f6';
                 e.target.style.transform = 'translateY(0)';
               }}
-            >
-              Fermer
-            </button>
+            >{t('common.fermer')}</button>
 
             {onEdit && (
               <button
@@ -932,16 +932,14 @@ const PATDetail = ({ pat, onClose, onEdit }) => {
                   e.target.style.boxShadow = '0 4px 6px -1px rgba(59, 130, 246, 0.3)';
                 }}
               >
-                <span>✏️</span>
-                Modifier
-              </button>
+                <span>✏️</span>{t('common.modifier')}</button>
             )}
           </div>
         </div>
       </div>
 
       {/* Animations CSS */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -1,9 +1,11 @@
+// Traduit automatiquement
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import CreateEnseignantForm from './CreateEnseignantForm';
-import EditEnseignantForm from './EditEnseignantForm';
 import EnseignantDetail from './EnseignantDetail';
+import EditEnseignantForm from './EditEnseignantForm';
 import {
   AcademicCapIcon,
   MagnifyingGlassIcon,
@@ -20,6 +22,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 const EnseignantsList = () => {
+ 
+ const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [enseignants, setEnseignants] = useState([]);
   const [filteredEnseignants, setFilteredEnseignants] = useState([]);
@@ -92,8 +96,8 @@ const EnseignantsList = () => {
       }
 
     } catch (err) {
-      console.error('❌ Erreur lors du chargement des enseignants:', err);
-      setError(err.response?.data?.detail || 'Erreur lors du chargement des enseignants');
+      console.error('❌ Erreur chargement des enseignants:', err);
+      setError(err.response?.data?.detail || `${t('common.erreurChargement')} des enseignants`);
     } finally {
       setIsLoading(false);
     }
@@ -147,8 +151,8 @@ const EnseignantsList = () => {
       setEnseignants(prev => prev.filter(e => e.id !== enseignantId));
       setFilteredEnseignants(prev => prev.filter(e => e.id !== enseignantId));
     } catch (err) {
-      console.error('❌ Erreur lors de la suppression:', err);
-      setError('Erreur lors de la suppression de l\'enseignant');
+      console.error('❌ Erreur suppression:', err);
+      setError(t('common.erreurSuppression') + ' de l\'enseignant');
     }
   };
 
@@ -405,9 +409,7 @@ const EnseignantsList = () => {
                   color: '#374151'
                 }}
               >
-                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-                Retour
-              </button>
+                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.retour')}</button>
               
               <div>
                 <div style={{
@@ -725,7 +727,7 @@ const EnseignantsList = () => {
                 <div>Échelon</div>
                 <div>Âge</div>
                 <div>Ancienneté</div>
-                <div style={{ textAlign: 'center' }}>Actions</div>
+                <div style={{ textAlign: 'center' }}>{t('common.actions')}</div>
               </div>
 
               {/* Lignes du tableau */}
@@ -914,8 +916,7 @@ const EnseignantsList = () => {
                         onMouseLeave={(e) => {
                           e.target.style.backgroundColor = '#f0fdf4';
                         }}
-                        title="Modifier"
-                      >
+                        title={t('common.modifier')}>
                         <PencilIcon style={{
                           width: '1rem',
                           height: '1rem',
@@ -941,8 +942,7 @@ const EnseignantsList = () => {
                         onMouseLeave={(e) => {
                           e.target.style.backgroundColor = '#fef3c7';
                         }}
-                        title="Supprimer"
-                      >
+                        title={t('common.supprimer')}>
                         <TrashIcon style={{
                           width: '1rem',
                           height: '1rem',

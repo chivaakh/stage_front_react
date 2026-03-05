@@ -1,8 +1,10 @@
+// Traduit automatiquement
 // src/components/ChefPAT/EditPATForm.js - FORMULAIRE ÉDITION PAT (VERSION FINALE CORRIGÉE)
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { apiService } from '../../services/api';
-
 const EditPATForm = ({ pat, onClose, onSuccess }) => {
+  const { t, isArabic } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -70,7 +72,7 @@ const EditPATForm = ({ pat, onClose, onSuccess }) => {
         date_prise_service: pat.date_prise_service || ''
       });
     }
-  }, [pat]);
+}, [pat]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -137,7 +139,7 @@ const EditPATForm = ({ pat, onClose, onSuccess }) => {
       const response = await apiService.updatePersonnelPAT(patId, patData);
       console.log('✅ Agent PAT modifié:', response);
 
-      alert('Agent PAT modifié avec succès');
+      alert('Agent PAT modifié' + t('common.succes'));
       onSuccess();
       
     } catch (err) {
@@ -513,9 +515,7 @@ const EditPATForm = ({ pat, onClose, onSuccess }) => {
                 fontWeight: '600',
                 color: '#374151',
                 marginBottom: '0.5rem'
-              }}>
-                Adresse
-              </label>
+              }}>{t('common.adresse')}</label>
               <textarea
                 name="adresse"
                 value={formData.adresse}
@@ -1032,9 +1032,7 @@ const EditPATForm = ({ pat, onClose, onSuccess }) => {
                   e.target.style.backgroundColor = '#f3f4f6';
                 }
               }}
-            >
-              Annuler
-            </button>
+            >{t('common.annuler')}</button>
 
             <button
               type="submit"
@@ -1092,7 +1090,7 @@ const EditPATForm = ({ pat, onClose, onSuccess }) => {
         </form>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }

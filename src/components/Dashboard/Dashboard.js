@@ -8,43 +8,92 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { apiService } from '../../services/api';
 import AdminDashboard from './AdminDashboard';
+import AdminRHDashboard from './AdminRH/AdminRHDashboard';
 import ChefDashboard from './ChefDashboard';
 import ChefEnseignantDashboard from './ChefEnseignant/ChefEnseignantDashboard';
+import ChefContractuelDashboard from './ChefContractuel/ChefContractuelDashboard';
 import EmployeDashboard from './EmployeDashboard';
+import OnboardingEmploye from '../Employe/OnboardingEmploye';
 
 const Dashboard = () => {
   const { user, isAdminRH, isChefService, getDashboardType } = useAuth();
+  const { t, isArabic } = useLanguage();
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         console.log('🔍 Récupération dashboard pour utilisateur:', user);
         console.log('🎯 Type de dashboard:', getDashboardType());
 
         // 🔄 MODIFICATION : Utiliser la nouvelle API
-        const response = await apiService.getDashboard('auto');
-        console.log('📊 Données dashboard reçues:', response);
-        
-        setDashboardData(response);
+        // Pour les employés, vérifier d'abord si le profil existe
+        if (user?.role === 'employe') {
+          try {
+            // Vérifier si le profil existe
+            await apiService.getMonProfil();
+            // Si oui, charger les données du dashboard
+            const response = await apiService.getDashboard('auto');
+            console.log('📊 Données dashboard reçues:', response);
+            setDashboardData(response);
+          } catch (profilErr) {
+            // Si le profil n'existe pas (404), rediriger vers l'onboarding
+            if (profilErr.response?.status === 404 || profilErr.response?.data?.error?.includes('Profil')) {
+              console.log('📝 Profil non trouvé, redirection vers onboarding');
+              setNeedsOnboarding(true);
+              setIsLoading(false);
+              return;
+            }
+            // Sinon, essayer quand même de charger le dashboard
+            try {
+              const response = await apiService.getDashboard('auto');
+              setDashboardData(response);
+            } catch (dashboardErr) {
+              throw dashboardErr;
+            }
+          }
+        } else {
+          const response = await apiService.getDashboard('auto');
+          console.log('📊 Données dashboard reçues:', response);
+          setDashboardData(response);
+        }
 
       } catch (err) {
         console.error('❌ Erreur lors du chargement du dashboard:', err);
-        
+        console.error('❌ Détails de l\'erreur:', {
+          status: err.response?.status,
+          statusText: err.response?.statusText,
+          data: err.response?.data,
+          url: err.config?.url,
+          message: err.message
+        });
+
         // Gestion spécifique des erreurs
-        if (err.response?.status === 403) {
+        if (err.response?.status === 404) {
+          // Si c'est un employé et que le profil n'existe pas, rediriger vers l'onboarding
+          if (user?.role === 'employe' && err.response?.data?.error?.includes('Profil')) {
+            setNeedsOnboarding(true);
+            setIsLoading(false);
+            return;
+          }
+          setError(err.response?.data?.message || err.response?.data?.error || 'Endpoint dashboard non trouvé. Veuillez vérifier que le serveur est démarré.');
+        } else if (err.response?.status === 403) {
           setError('Vous n\'avez pas les permissions nécessaires pour accéder à ce dashboard');
         } else if (err.response?.status === 401) {
           setError('Session expirée, veuillez vous reconnecter');
+        } else if (err.message === 'Token d\'authentification manquant') {
+          setError('Authentification requise. Veuillez vous reconnecter.');
         } else {
-          setError(err.response?.data?.detail || 'Erreur lors du chargement des données du dashboard');
+          setError(err.response?.data?.detail || err.response?.data?.message || 'Erreur lors du chargement des données du dashboard');
         }
       } finally {
         setIsLoading(false);
@@ -58,7 +107,13 @@ const Dashboard = () => {
 
   // 🔄 MODIFICATION : Logique de rendu corrigée
   const renderDashboard = () => {
-    if (!user || !dashboardData) {
+    // Si l'employé a besoin d'onboarding, afficher le formulaire d'onboarding
+    if (user?.role === 'employe' && needsOnboarding) {
+      console.log('📝 Affichage OnboardingEmploye');
+      return <OnboardingEmploye />;
+    }
+
+    if (!user || (!dashboardData && !needsOnboarding)) {
       return null;
     }
 
@@ -69,20 +124,28 @@ const Dashboard = () => {
       console.log('🎓 Affichage ChefEnseignantDashboard');
       return <ChefEnseignantDashboard data={dashboardData} />;
     }
-    
+
     // Autres rôles
     switch (user.role) {
       case 'admin_rh':
-        console.log('👨‍💼 Affichage AdminDashboard');
-        return <AdminDashboard data={dashboardData} />;
-      
+        console.log('👑 Affichage AdminRHDashboard');
+        return <AdminRHDashboard />;
+
       case 'chef_pat':
-      case 'chef_contractuel':
         console.log('👥 Affichage ChefDashboard générique pour:', user.role);
         return <ChefDashboard data={dashboardData} />;
-      
+
+      case 'chef_contractuel':
+        console.log('📋 Affichage ChefContractuelDashboard');
+        return <ChefContractuelDashboard />;
+
       case 'employe':
       default:
+        // Si l'employé n'a pas de profil, afficher l'onboarding
+        if (needsOnboarding) {
+          console.log('📝 Affichage OnboardingEmploye');
+          return <OnboardingEmploye />;
+        }
         console.log('👤 Affichage EmployeDashboard');
         return <EmployeDashboard data={dashboardData} />;
     }
@@ -156,7 +219,7 @@ const Dashboard = () => {
             background: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
             animation: 'pulse 2s ease-in-out infinite'
           }}></div>
-          
+
           <div style={{
             width: '5rem',
             height: '5rem',
@@ -168,7 +231,7 @@ const Dashboard = () => {
             position: 'relative',
             zIndex: 1
           }}></div>
-          
+
           <h3 style={{
             color: '#3b82f6',
             fontSize: '1.5rem',
@@ -179,7 +242,7 @@ const Dashboard = () => {
           }}>
             Chargement du dashboard
           </h3>
-          
+
           <p style={{
             color: '#6b7280',
             margin: 0,
@@ -189,7 +252,7 @@ const Dashboard = () => {
           }}>
             Préparation de votre espace de travail personnalisé...
           </p>
-          
+
           {/* Indicateur de progression */}
           <div style={{
             width: '100%',
@@ -209,7 +272,7 @@ const Dashboard = () => {
               animation: 'progress 2s ease-in-out infinite'
             }}></div>
           </div>
-          
+
           <style jsx>{`
             @keyframes spin {
               0% { transform: rotate(0deg); }
@@ -260,7 +323,7 @@ const Dashboard = () => {
             background: 'radial-gradient(circle at 30% 70%, rgba(239, 68, 68, 0.05) 0%, transparent 50%)',
             opacity: 0.5
           }}></div>
-          
+
           <div style={{
             width: '5rem',
             height: '5rem',
@@ -278,7 +341,7 @@ const Dashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          
+
           <h2 style={{
             fontSize: '2rem',
             fontWeight: '800',
@@ -289,7 +352,7 @@ const Dashboard = () => {
           }}>
             Erreur de chargement
           </h2>
-          
+
           <p style={{
             color: '#6b7280',
             marginBottom: '2rem',
@@ -300,7 +363,7 @@ const Dashboard = () => {
           }}>
             {error}
           </p>
-          
+
           <div style={{
             display: 'flex',
             gap: '1rem',
@@ -333,7 +396,7 @@ const Dashboard = () => {
             >
               🔄 Réessayer
             </button>
-            
+
             <button
               onClick={() => window.location.href = '/'}
               style={{
@@ -375,7 +438,7 @@ const Dashboard = () => {
       padding: '2rem'
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        
+
         {/* Header du dashboard - DESIGN PREMIUM */}
         <div style={{
           background: roleColors.background,
@@ -399,7 +462,7 @@ const Dashboard = () => {
             opacity: 0.3,
             transform: 'rotate(45deg)'
           }}></div>
-          
+
           <div style={{
             position: 'absolute',
             top: '-50%',
@@ -443,7 +506,7 @@ const Dashboard = () => {
                     {user.role === 'employe' && '👤'}
                   </span>
                 </div>
-                
+
                 <div>
                   <h1 style={{
                     fontSize: '2.5rem',
@@ -451,25 +514,27 @@ const Dashboard = () => {
                     margin: 0,
                     letterSpacing: '-0.025em'
                   }}>
-                    {user.role === 'admin_rh' && 'Dashboard Administrateur RH'}
-                    {user.role === 'chef_enseignant' && 'Dashboard Chef Service Enseignant'}
-                    {user.role === 'chef_pat' && 'Dashboard Chef Service PAT'}
-                    {user.role === 'chef_contractuel' && 'Dashboard Chef Service Contractuel'}
-                    {user.role === 'employe' && 'Dashboard Employé'}
+                    {user.role === 'admin_rh' && t('dashboard.adminRH')}
+                    {user.role === 'chef_enseignant' && t('dashboard.chefEnseignant')}
+                    {user.role === 'chef_pat' && t('dashboard.chefPAT')}
+                    {user.role === 'chef_contractuel' && t('dashboard.chefContractuel')}
+                    {user.role === 'employe' && t('dashboard.employe')}
                   </h1>
-                  
+
                   <p style={{
                     fontSize: '1.25rem',
                     marginTop: '0.5rem',
                     margin: 0,
                     opacity: 0.9,
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    textAlign: isArabic ? 'right' : 'left',
+                    direction: isArabic ? 'rtl' : 'ltr'
                   }}>
-                    Bonjour {user?.first_name || user?.username}, voici un aperçu de votre activité 👋
+                    {t('dashboard.bonjourApercu', { name: user?.first_name || user?.username })} 👋
                   </p>
                 </div>
               </div>
-              
+
               {/* Informations de service */}
               <div style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -489,7 +554,7 @@ const Dashboard = () => {
                       margin: '0 0 0.5rem 0',
                       opacity: 0.8
                     }}>
-                      Rôle
+                      {t('dashboard.role')}
                     </p>
                     <p style={{
                       fontWeight: '700',
@@ -500,31 +565,31 @@ const Dashboard = () => {
                       {user?.role?.replace('_', ' ')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p style={{
                       fontSize: '0.875rem',
                       margin: '0 0 0.5rem 0',
                       opacity: 0.8
                     }}>
-                      Dernière connexion
+                      {t('dashboard.derniereConnexion')}
                     </p>
                     <p style={{
                       fontWeight: '700',
                       margin: 0,
                       fontSize: '1.125rem'
                     }}>
-                      {new Date().toLocaleDateString('fr-FR')}
+                      {new Date().toLocaleDateString(isArabic ? 'ar-MA' : 'fr-FR')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p style={{
                       fontSize: '0.875rem',
                       margin: '0 0 0.5rem 0',
                       opacity: 0.8
                     }}>
-                      Statut
+                      {t('dashboard.statut')}
                     </p>
                     <div style={{
                       display: 'flex',
@@ -543,14 +608,14 @@ const Dashboard = () => {
                         margin: 0,
                         fontSize: '1.125rem'
                       }}>
-                        En ligne
+                        {t('dashboard.enLigne')}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* Avatar et informations utilisateur - DESIGN AMÉLIORÉ */}
             <div style={{
               display: 'flex',
@@ -564,7 +629,7 @@ const Dashboard = () => {
                   margin: '0 0 0.5rem 0',
                   opacity: 0.8
                 }}>
-                  Utilisateur connecté
+                  {t('dashboard.utilisateurConnecte')}
                 </p>
                 <p style={{
                   fontWeight: '700',
@@ -581,7 +646,7 @@ const Dashboard = () => {
                   {user?.email}
                 </p>
               </div>
-              
+
               <div style={{
                 width: '4rem',
                 height: '4rem',
@@ -601,7 +666,7 @@ const Dashboard = () => {
                 }}>
                   {(user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U').toUpperCase()}
                 </span>
-                
+
                 {/* Indicateur de statut en ligne amélioré */}
                 <div style={{
                   position: 'absolute',
@@ -617,7 +682,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          
+
           <style jsx>{`
             @keyframes rotate {
               0% { transform: rotate(0deg); }
@@ -650,7 +715,7 @@ const Dashboard = () => {
             background: `radial-gradient(circle, ${roleColors.primary}10 0%, transparent 70%)`,
             transform: 'translate(25%, -25%)'
           }}></div>
-          
+
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -670,7 +735,7 @@ const Dashboard = () => {
             }}>
               <span style={{ fontSize: '2rem', color: 'white' }}>🚀</span>
             </div>
-            
+
             <div>
               <h3 style={{
                 fontSize: '1.25rem',
@@ -678,22 +743,24 @@ const Dashboard = () => {
                 color: '#111827',
                 margin: '0 0 0.5rem 0'
               }}>
-                Bienvenue dans votre espace de travail !
+                {t('dashboard.bienvenueEspaceTravail')}
               </h3>
               <p style={{
                 color: '#6b7280',
                 margin: 0,
                 fontSize: '1rem',
-                lineHeight: '1.5'
+                lineHeight: '1.5',
+                textAlign: isArabic ? 'right' : 'left',
+                direction: isArabic ? 'rtl' : 'ltr'
               }}>
-                {user.role === 'admin_rh' && 'Gérez l\'ensemble des ressources humaines et supervisez tous les services.'}
-                {user.role === 'chef_enseignant' && 'Supervisez votre équipe enseignante et gérez les activités pédagogiques.'}
-                {user.role === 'chef_pat' && 'Coordonnez les activités du personnel administratif et technique.'}
-                {user.role === 'chef_contractuel' && 'Gérez les ressources contractuelles et les projets spéciaux.'}
-                {user.role === 'employe' && 'Accédez à vos informations personnelles et soumettez vos demandes.'}
+                {user.role === 'admin_rh' && t('dashboard.descriptionAdminRH')}
+                {user.role === 'chef_enseignant' && t('dashboard.descriptionChefEnseignant')}
+                {user.role === 'chef_pat' && t('dashboard.descriptionChefPAT')}
+                {user.role === 'chef_contractuel' && t('dashboard.descriptionChefContractuel')}
+                {user.role === 'employe' && t('dashboard.descriptionEmploye')}
               </p>
             </div>
-            
+
             <div style={{
               padding: '1rem',
               backgroundColor: roleColors.light,
@@ -708,14 +775,14 @@ const Dashboard = () => {
                 color: roleColors.primary,
                 marginBottom: '0.25rem'
               }}>
-                {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                {new Date().toLocaleTimeString(isArabic ? 'ar-MA' : 'fr-FR', { hour: '2-digit', minute: '2-digit' })}
               </div>
               <div style={{
                 fontSize: '0.75rem',
                 color: '#6b7280',
                 fontWeight: '500'
               }}>
-                Heure actuelle
+                {t('dashboard.heureActuelle')}
               </div>
             </div>
           </div>
@@ -731,118 +798,6 @@ const Dashboard = () => {
           marginBottom: '2rem'
         }}>
           {renderDashboard()}
-        </div>
-
-        {/* Footer informatif stylé */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
-          borderRadius: '1rem',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-          padding: '2rem',
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
-            opacity: 0.5
-          }}></div>
-          
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '2rem',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <div>
-              <h4 style={{
-                fontSize: '1.25rem',
-                fontWeight: '700',
-                margin: '0 0 0.5rem 0'
-              }}>
-                MESRS - Système de Gestion des Ressources Humaines
-              </h4>
-              <p style={{
-                margin: 0,
-                opacity: 0.8,
-                fontSize: '1rem'
-              }}>
-                Plateforme moderne et sécurisée pour la gestion administrative
-              </p>
-            </div>
-            
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '2rem'
-            }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '700',
-                  marginBottom: '0.25rem'
-                }}>
-                  v1.0.0
-                </div>
-                <div style={{
-                  fontSize: '0.875rem',
-                  opacity: 0.8
-                }}>
-                  Version
-                </div>
-              </div>
-              
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '700',
-                  marginBottom: '0.25rem'
-                }}>
-                  {new Date().toLocaleDateString('fr-FR')}
-                </div>
-                <div style={{
-                  fontSize: '0.875rem',
-                  opacity: 0.8
-                }}>
-                  Dernière MAJ
-                </div>
-              </div>
-              
-              <div style={{
-                padding: '1rem',
-                backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                borderRadius: '0.75rem',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-                textAlign: 'center'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  color: '#22c55e'
-                }}>
-                  <div style={{
-                    width: '0.75rem',
-                    height: '0.75rem',
-                    backgroundColor: '#22c55e',
-                    borderRadius: '50%',
-                    animation: 'pulse 2s infinite'
-                  }}></div>
-                  Système opérationnel
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

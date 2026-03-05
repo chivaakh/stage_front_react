@@ -1,6 +1,7 @@
+// Traduit automatiquement
 // src/components/Common/MauritanianWrapper.js - WRAPPER POUR INTÉGRATION
 import React from 'react';
-
+import { useLanguage } from '../../contexts/LanguageContext';
 /**
  * Wrapper pour adapter nos nouveaux composants au design mauritanien existant
  * Ce composant applique les styles mauritaniens à nos nouveaux modules
@@ -13,6 +14,7 @@ const MauritanianWrapper = ({
   showBackButton = true,
   backUrl = '/dashboard'
 }) => {
+  const { t, isArabic } = useLanguage();
   return (
     <div style={{
       minHeight: 'calc(100vh - 200px)',

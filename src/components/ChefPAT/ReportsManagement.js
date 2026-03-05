@@ -1,3 +1,4 @@
+// Traduit automatiquement
 /**
  * ARBORESCENCE DU FICHIER:
  * src/
@@ -7,20 +8,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
-import {
-  ChartBarIcon,
-  ArrowLeftIcon,
-  CalendarDaysIcon,
-  DocumentArrowDownIcon,
-  ClockIcon,
-  UserGroupIcon,
-  BriefcaseIcon,
-  ExclamationTriangleIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon
-} from '@heroicons/react/24/outline';
 import {
   BarChart,
   Bar,
@@ -36,8 +26,18 @@ import {
   Cell,
   ResponsiveContainer
 } from 'recharts';
+import {
+  ArrowLeftIcon,
+  ChartBarIcon,
+  DocumentArrowDownIcon,
+  ExclamationTriangleIcon,
+  CalendarDaysIcon,
+  UserGroupIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline';
 
 const ReportsManagement = () => {
+  const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -46,7 +46,7 @@ const ReportsManagement = () => {
     month: new Date().toISOString().slice(0, 7),
     year: new Date().getFullYear()
   });
-  
+
   // États pour les données de rapports
   const [monthlyReport, setMonthlyReport] = useState(null);
   const [annualReport, setAnnualReport] = useState(null);
@@ -73,14 +73,14 @@ const ReportsManagement = () => {
       setIsLoading(true);
       setError(null);
       console.log('📊 Chargement rapport mensuel PAT pour:', selectedPeriod.month);
-      
+
       const response = await apiService.get(`/personnel-pat/rapport_mensuel/?mois=${selectedPeriod.month}`);
       console.log('✅ Rapport mensuel PAT reçu:', response.data);
       setMonthlyReport(response.data);
     } catch (err) {
       console.error('❌ Erreur chargement rapport mensuel PAT:', err);
-      setError('Erreur lors du chargement du rapport mensuel');
-      
+      setError(t('common.erreurChargement') + ' du rapport mensuel');
+
       // ✅ DONNÉES DE DÉMONSTRATION EN CAS D'ERREUR
       console.log('🔄 Utilisation des données de démonstration...');
       setMonthlyReport({
@@ -121,14 +121,14 @@ const ReportsManagement = () => {
       setIsLoading(true);
       setError(null);
       console.log('📊 Chargement rapport annuel PAT pour:', selectedPeriod.year);
-      
+
       const response = await apiService.get(`/personnel-pat/rapport_annuel/?annee=${selectedPeriod.year}`);
       console.log('✅ Rapport annuel PAT reçu:', response.data);
       setAnnualReport(response.data);
     } catch (err) {
       console.error('❌ Erreur chargement rapport annuel PAT:', err);
-      setError('Erreur lors du chargement du rapport annuel');
-      
+      setError(t('common.erreurChargement') + ' du rapport annuel');
+
       // ✅ DONNÉES DE DÉMONSTRATION EN CAS D'ERREUR
       console.log('🔄 Utilisation des données de démonstration...');
       setAnnualReport({
@@ -170,10 +170,10 @@ const ReportsManagement = () => {
     try {
       setExportLoading(true);
       console.log('📥 Export rapport PAT:', format, type);
-      
+
       // ✅ EXPORT SIMPLIFIÉ POUR DÉMONSTRATION
       const dataToExport = activeTab === 'monthly' ? monthlyReport : annualReport;
-      
+
       if (format === 'csv') {
         // Créer un CSV simple
         let csvContent = '';
@@ -187,7 +187,7 @@ const ReportsManagement = () => {
             csvContent += `${item.label},${item.count}\n`;
           });
         }
-        
+
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -210,7 +210,7 @@ const ReportsManagement = () => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }
-      
+
     } catch (err) {
       console.error('❌ Erreur export:', err);
       setError('Erreur lors de l\'export du rapport');
@@ -287,7 +287,7 @@ const ReportsManagement = () => {
       padding: '2rem'
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        
+
         {/* En-tête moderne */}
         <div style={{
           backgroundColor: 'white',
@@ -332,10 +332,8 @@ const ReportsManagement = () => {
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-                Retour
-              </button>
-              
+                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.retour')}</button>
+
               <div>
                 <div style={{
                   fontSize: '0.75rem',
@@ -452,9 +450,9 @@ const ReportsManagement = () => {
               flexWrap: 'wrap',
               gap: '1.5rem'
             }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: '1.5rem',
                 flex: '1'
               }}>
@@ -519,8 +517,8 @@ const ReportsManagement = () => {
               </div>
 
               {/* Boutons d'export */}
-              <div style={{ 
-                display: 'flex', 
+              <div style={{
+                display: 'flex',
                 gap: '0.75rem',
                 flexShrink: 0
               }}>
@@ -546,7 +544,7 @@ const ReportsManagement = () => {
                   <DocumentArrowDownIcon style={{ width: '1rem', height: '1rem' }} />
                   Export JSON
                 </button>
-                
+
                 <button
                   onClick={() => handleExportReport('csv', 'detaille')}
                   disabled={exportLoading}
@@ -624,7 +622,7 @@ const ReportsManagement = () => {
           overflow: 'hidden',
           marginBottom: '2rem'
         }}>
-          <div style={{ 
+          <div style={{
             display: 'flex',
             backgroundColor: '#f8fafc',
             borderBottom: '1px solid #e5e7eb'
@@ -891,8 +889,8 @@ const ReportsManagement = () => {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={monthlyReport.absences_par_type}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="type_absence" 
+                      <XAxis
+                        dataKey="type_absence"
                         angle={-45}
                         textAnchor="end"
                         height={100}
@@ -1140,10 +1138,10 @@ const ReportsManagement = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="nombre_absences" 
-                      stroke="#3b82f6" 
+                    <Line
+                      type="monotone"
+                      dataKey="nombre_absences"
+                      stroke="#3b82f6"
                       strokeWidth={3}
                       name="Nombre d'absences"
                       dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}

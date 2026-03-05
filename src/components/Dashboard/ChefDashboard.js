@@ -6,12 +6,30 @@ import {
   DocumentTextIcon,
   CheckCircleIcon,
   BuildingOfficeIcon,
-  ExclamationCircleIcon,
+  ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 
+
+import { useAuth } from '../../contexts/AuthContext';
+
 const ChefDashboard = ({ data }) => {
+  const { user } = useAuth();
   const serviceInfo = data?.service_info || {};
   const stats = data?.statistiques || {};
+
+  // Déterminer le lien de gestion d'équipe en fonction du rôle
+  const getEquipeLink = () => {
+    switch (user?.role) {
+      case 'chef_pat':
+        return '/chef-pat/personnel';
+      case 'chef_contractuel':
+        return '/chef-contractuel/personnel';
+      case 'chef_enseignant':
+        return '/chef-enseignant/enseignants';
+      default:
+        return '/mon-equipe';
+    }
+  };
 
   const statsCards = [
     {
@@ -19,7 +37,7 @@ const ChefDashboard = ({ data }) => {
       value: stats.total_employes || 0,
       icon: UserGroupIcon,
       color: 'blue',
-      link: '/mon-equipe'
+      link: getEquipeLink()
     },
     {
       title: 'Absences en attente',
@@ -73,7 +91,7 @@ const ChefDashboard = ({ data }) => {
         }}>
           Mon Service
         </h2>
-        
+
         <div style={{
           backgroundColor: '#f8fafc',
           borderRadius: '0.5rem',
@@ -111,7 +129,7 @@ const ChefDashboard = ({ data }) => {
               </p>
             </div>
           </div>
-          
+
           {serviceInfo.description && (
             <p style={{
               fontSize: '0.875rem',
@@ -135,7 +153,7 @@ const ChefDashboard = ({ data }) => {
         {statsCards.map((card, index) => {
           const colorStyles = getColorStyles(card.color);
           const IconComponent = card.icon;
-          
+
           return (
             <Link key={index} to={card.link} style={{ textDecoration: 'none' }}>
               <div style={{
@@ -147,14 +165,14 @@ const ChefDashboard = ({ data }) => {
                 cursor: 'pointer',
                 border: '1px solid #e5e7eb'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)';
-              }}>
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)';
+                }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <p style={{
@@ -265,7 +283,7 @@ const ChefDashboard = ({ data }) => {
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1rem'
         }}>
-          <Link to="/mon-equipe" style={{ textDecoration: 'none' }}>
+          <Link to={getEquipeLink()} style={{ textDecoration: 'none' }}>
             <button style={{
               width: '100%',
               padding: '0.75rem',
@@ -277,8 +295,8 @@ const ChefDashboard = ({ data }) => {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}>
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}>
               Gérer mon équipe
             </button>
           </Link>
@@ -295,8 +313,8 @@ const ChefDashboard = ({ data }) => {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#b45309'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#d97706'}>
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#b45309'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#d97706'}>
               Approuver absences
             </button>
           </Link>
@@ -313,8 +331,8 @@ const ChefDashboard = ({ data }) => {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#15803d'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#16a34a'}>
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#15803d'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#16a34a'}>
               Gérer documents
             </button>
           </Link>
@@ -331,8 +349,8 @@ const ChefDashboard = ({ data }) => {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#6d28d9'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#7c3aed'}>
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#6d28d9'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#7c3aed'}>
               Infos service
             </button>
           </Link>

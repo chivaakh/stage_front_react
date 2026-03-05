@@ -1,8 +1,12 @@
+// Traduit automatiquement
 // src/components/ChefPAT/AbsencesManagement.js - GESTION ABSENCES PAT
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { apiService } from '../../services/api';
-
+import CreateAbsenceForm from '../Common/CreateAbsenceForm';
+import { PlusIcon } from '@heroicons/react/24/outline';
 const AbsencesManagement = () => {
+  const { t, isArabic } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [absences, setAbsences] = useState([]);
   const [filteredAbsences, setFilteredAbsences] = useState([]);
@@ -14,6 +18,7 @@ const AbsencesManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date_debut');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     loadAbsences();
@@ -37,11 +42,11 @@ const AbsencesManagement = () => {
       
     } catch (err) {
       console.error('❌ Erreur chargement absences:', err);
-      setError('Erreur lors du chargement des absences');
+      setError(t('common.erreurChargement') + ' des absences');
     } finally {
       setLoading(false);
     }
-  };
+};
 
   const applyFiltersAndSort = () => {
     let result = [...absences];
@@ -101,7 +106,7 @@ const AbsencesManagement = () => {
     try {
       console.log('✅ Approbation absence:', absenceId);
       await apiService.approuverAbsence(absenceId, 'Approuvé par le chef de service PAT');
-      alert('Absence approuvée avec succès');
+      alert('Absence approuvée' + t('common.succes'));
       await loadAbsences();
     } catch (err) {
       console.error('❌ Erreur approbation:', err);
@@ -235,37 +240,73 @@ const AbsencesManagement = () => {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '1.5rem'
+            justifyContent: 'space-between'
           }}>
             <div style={{
-              width: '4rem',
-              height: '4rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: '1rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(10px)',
-              fontSize: '2rem'
+              gap: '1.5rem'
             }}>
-              ⏰
-            </div>
-            <div>
-              <h1 style={{
-                fontSize: '2rem',
-                fontWeight: '800',
-                margin: '0 0 0.5rem 0'
+              <div style={{
+                width: '4rem',
+                height: '4rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(10px)',
+                fontSize: '2rem'
               }}>
-                Gestion des Absences - Personnel PAT
-              </h1>
-              <p style={{
+                ⏰
+              </div>
+              <div>
+                <h1 style={{
+                  fontSize: '2rem',
+                  fontWeight: '800',
+                  margin: '0 0 0.5rem 0'
+                }}>
+                  Gestion des Absences - Personnel PAT
+                </h1>
+                <p style={{
+                  fontSize: '1rem',
+                  margin: 0,
+                  opacity: 0.9
+                }}>
+                  Approuvez ou refusez les demandes d'absence de votre équipe
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowCreateForm(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '1rem 2rem',
+                backgroundColor: 'white',
+                color: '#f59e0b',
+                border: 'none',
+                borderRadius: '0.75rem',
                 fontSize: '1rem',
-                margin: 0,
-                opacity: 0.9
-              }}>
-                Approuvez ou refusez les demandes d'absence de votre équipe
-              </p>
-            </div>
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 14px 0 rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 8px 25px 0 rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 14px 0 rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              <PlusIcon style={{ width: '1rem', height: '1rem' }} />
+              Créer une absence
+            </button>
           </div>
         </div>
 
@@ -301,7 +342,7 @@ const AbsencesManagement = () => {
             <div style={{ fontSize: '2rem', fontWeight: '800', color: '#f59e0b' }}>
               {stats.enAttente}
             </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>En attente</div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{t('common.enAttente')}</div>
           </div>
 
           <div style={{
@@ -343,7 +384,7 @@ const AbsencesManagement = () => {
             <div style={{ fontSize: '2rem', fontWeight: '800', color: '#111827' }}>
               {stats.total}
             </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total</div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{t('common.total')}</div>
           </div>
         </div>
 
@@ -412,10 +453,10 @@ const AbsencesManagement = () => {
                 }}
               >
                 <option value="">Tous</option>
-                <option value="EN_ATTENTE">En attente</option>
-                <option value="APPROUVÉ">Approuvé</option>
-                <option value="REFUSÉ">Refusé</option>
-                <option value="ANNULÉ">Annulé</option>
+                <option value="EN_ATTENTE">{t('common.enAttente')}</option>
+                <option value="APPROUVÉ">{t('common.approuve')}</option>
+                <option value="REFUSÉ">{t('common.refuse')}</option>
+                <option value="ANNULÉ">{t('common.annule')}</option>
               </select>
             </div>
 
@@ -759,6 +800,17 @@ const AbsencesManagement = () => {
           100% { transform: rotate(360deg); }
         }
       `}</style>
+
+      {/* Formulaire de création d'absence */}
+      {showCreateForm && (
+        <CreateAbsenceForm
+          onClose={() => setShowCreateForm(false)}
+          onSuccess={() => {
+            setShowCreateForm(false);
+            loadAbsences();
+          }}
+        />
+      )}
     </div>
   );
 };

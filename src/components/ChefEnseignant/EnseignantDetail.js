@@ -1,4 +1,6 @@
+// Traduit automatiquement
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import {
@@ -22,6 +24,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
+  const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [enseignant, setEnseignant] = useState(null);
   const [absences, setAbsences] = useState([]);
@@ -56,7 +59,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
 
       } catch (err) {
         console.error('❌ Erreur chargement enseignant:', err);
-        setError(err.response?.data?.detail || 'Erreur lors du chargement des données');
+        setError(err.response?.data?.detail || `${t('common.erreurChargement')} des données`);
       } finally {
         setIsLoading(false);
       }
@@ -74,18 +77,18 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
     }
 
     try {
-      await apiService.delete(`/enseignants/${enseignantId}/`);
+      await apiService.delete('/enseignants/${enseignantId}/');
       onBack();
     } catch (err) {
       console.error('❌ Erreur suppression:', err);
-      alert('❌ Erreur lors de la suppression');
+      alert('❌' + t('common.erreurSuppression'));
     }
   };
 
   // Approuver une absence (fonctionnalité conservée)
   const handleApproveAbsence = async (absenceId) => {
     try {
-      await apiService.post(`/absences/${absenceId}/approuver/`, {
+      await apiService.post('/absences/${absenceId}/approuver/', {
         commentaire: 'Approuvé par le chef de service enseignant'
       });
       
@@ -106,7 +109,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
     if (!motif) return;
 
     try {
-      await apiService.post(`/absences/${absenceId}/refuser/`, {
+      await apiService.post('/absences/${absenceId}/refuser/', {
         motif_refus: motif
       });
       
@@ -154,11 +157,10 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
 
   const getStatutLabel = (statut) => {
     const labels = {
-      'EN_ATTENTE': 'En attente',
-      'APPROUVÉ': 'Approuvé',
-      'REFUSÉ': 'Refusé',
-      'ANNULÉ': 'Annulé'
-    };
+      'EN_ATTENTE': t('common.enAttente'),
+      'APPROUVÉ': t('common.approuve'),
+      'REFUSÉ': t('common.refuse'),
+      'ANNULÉ': t('common.annule') };
     return labels[statut] || statut;
   };
 
@@ -233,7 +235,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
             Récupération des informations de l'enseignant...
           </p>
         </div>
-        <style jsx>{`
+        <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -348,9 +350,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
               fontWeight: '500',
               cursor: 'pointer'
             }}
-          >
-            Retour
-          </button>
+          >{t('common.retour')}</button>
         </div>
       </div>
     );
@@ -399,9 +399,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
                   color: '#374151'
                 }}
               >
-                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-                Retour
-              </button>
+                <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.retour')}</button>
               
               <div>
                 <div style={{
@@ -446,9 +444,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
                   fontWeight: '500'
                 }}
               >
-                <PencilIcon style={{ width: '1rem', height: '1rem' }} />
-                Modifier
-              </button>
+                <PencilIcon style={{ width: '1rem', height: '1rem' }} />{t('common.modifier')}</button>
               
               <button
                 onClick={handleDelete}
@@ -466,9 +462,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
                   fontWeight: '500'
                 }}
               >
-                <TrashIcon style={{ width: '1rem', height: '1rem' }} />
-                Supprimer
-              </button>
+                <TrashIcon style={{ width: '1rem', height: '1rem' }} />{t('common.supprimer')}</button>
             </div>
           </div>
 
@@ -1196,9 +1190,7 @@ const EnseignantDetail = ({ enseignantId, onBack, onEdit }) => {
                               fontWeight: '500'
                             }}
                           >
-                            <EyeIcon style={{ width: '1rem', height: '1rem' }} />
-                            Voir
-                          </button>
+                            <EyeIcon style={{ width: '1rem', height: '1rem' }} />{t('common.voir')}</button>
                         </div>
                       </div>
                     ))}

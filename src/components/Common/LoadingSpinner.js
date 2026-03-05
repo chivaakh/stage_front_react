@@ -1,5 +1,5 @@
+// Traduit automatiquement
 import React from 'react';
-
 const LoadingSpinner = ({ size = 'medium', message = 'Chargement...' }) => {
   const sizeClasses = {
     small: 'h-6 w-6',

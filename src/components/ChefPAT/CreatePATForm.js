@@ -1,8 +1,10 @@
+// Traduit automatiquement
 // src/components/ChefPAT/CreatePATForm.js - FORMULAIRE CRÉATION PAT
 import React, { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { apiService } from '../../services/api';
-
 const CreatePATForm = ({ onClose, onSuccess }) => {
+  const { t, isArabic } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -89,12 +91,12 @@ const CreatePATForm = ({ onClose, onSuccess }) => {
       const response = await apiService.post('/personnel-pat/', patData);
       console.log('✅ Agent PAT créé:', response.data);
 
-      alert('Agent PAT créé avec succès');
+      alert('Agent PAT créé');
       onSuccess();
       
     } catch (err) {
       console.error('❌ Erreur création:', err);
-      setError(err.response?.data?.detail || 'Erreur lors de la création');
+      setError(err.response?.data?.detail || 'Erreur lors de la création du PAT');
     } finally {
       setLoading(false);
     }
@@ -423,9 +425,7 @@ const CreatePATForm = ({ onClose, onSuccess }) => {
                 fontWeight: '600',
                 color: '#374151',
                 marginBottom: '0.5rem'
-              }}>
-                Adresse
-              </label>
+              }}>{t('common.adresse')}</label>
               <textarea
                 name="adresse"
                 value={formData.adresse}
@@ -930,9 +930,7 @@ const CreatePATForm = ({ onClose, onSuccess }) => {
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.5 : 1
               }}
-            >
-              Annuler
-            </button>
+            >{t('common.annuler')}</button>
 
             <button
               type="submit"

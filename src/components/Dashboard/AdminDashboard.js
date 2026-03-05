@@ -6,8 +6,9 @@ import {
   UserGroupIcon,
   ClockIcon,
   DocumentTextIcon,
-  ExclamationTriangleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+
 
 const AdminDashboard = ({ data }) => {
   const stats = data?.statistiques_generales || {};

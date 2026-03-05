@@ -1,11 +1,23 @@
+// Traduit automatiquement
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, UserGroupIcon } from '@heroicons/react/24/outline';
-
+import RegisterEmploye from './RegisterEmploye';
+import {
+  BriefcaseIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  LockClosedIcon,
+  UserGroupIcon,
+  UserIcon
+} from '@heroicons/react/24/outline';
 const Login = () => {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
+  const [view, setView] = useState('role'); // 'role', 'login', 'register'
+  const [selectedRole, setSelectedRole] = useState(null);
   const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,7 +33,7 @@ const Login = () => {
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+navigate(from, { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate, location]);
 
@@ -35,8 +47,13 @@ const Login = () => {
       });
 
       if (result.success) {
-        const from = location.state?.from?.pathname || '/dashboard';
-        navigate(from, { replace: true });
+        // Si c'est un employé sans profil, rediriger vers l'onboarding
+        if (result.user?.role === 'employe' && !result.user?.personne_id) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          const from = location.state?.from?.pathname || '/dashboard';
+          navigate(from, { replace: true });
+        }
       } else {
         setError('root', {
           type: 'manual',
@@ -50,6 +67,20 @@ const Login = () => {
         message: 'Une erreur est survenue lors de la connexion',
       });
     }
+  };
+
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    if (role === 'employe') {
+      setView('register');
+    } else {
+      setView('login');
+    }
+  };
+
+  const handleRegisterSuccess = (user) => {
+    // Rediriger vers l'onboarding après l'inscription
+    navigate('/onboarding', { replace: true });
   };
 
   const togglePasswordVisibility = () => {
@@ -79,13 +110,13 @@ const Login = () => {
             width: '3rem',
             height: '3rem',
             border: '3px solid #e5e7eb',
-            borderTop: '3px solid #059669',
+            borderTop: '3px solid #1e3a8a',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
             margin: '0 auto 1.5rem'
           }}></div>
           <h3 style={{
-            color: '#059669',
+            color: '#1e3a8a',
             fontSize: '1.25rem',
             fontWeight: '600',
             marginBottom: '0.5rem'
@@ -101,13 +132,24 @@ const Login = () => {
           </p>
         </div>
         
-        <style jsx>{`
+        <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
         `}</style>
       </div>
+    );
+  }
+
+  // Afficher le formulaire d'inscription si l'utilisateur a choisi le rôle employé
+  if (view === 'register') {
+    return (
+      <RegisterEmploye 
+        onBack={() => setView('role')}
+        onSuccess={handleRegisterSuccess}
+        onSwitchToLogin={() => setView('login')}
+      />
     );
   }
 
@@ -204,7 +246,7 @@ const Login = () => {
               </p>
               <p style={{
                 fontSize: '0.95rem',
-                color: '#059669',
+                color: '#1e3a8a',
                 margin: 0,
                 fontWeight: '600'
               }}>
@@ -220,12 +262,12 @@ const Login = () => {
           }}>
             <div style={{
               padding: '0.75rem 1.5rem',
-              background: '#f0fdf4',
+              background: '#f1f5f9',
               borderRadius: '50px',
-              color: '#059669',
+              color: '#1e3a8a',
               fontSize: '0.875rem',
               fontWeight: '600',
-              border: '1px solid #bbf7d0'
+              border: '1px solid #cbd5e1'
             }}>
               Ministère de l'Enseignement Supérieur
             </div>
@@ -273,7 +315,7 @@ const Login = () => {
                 right: 0,
                 width: '80px',
                 height: '80px',
-                background: '#f0fdf4',
+                background: '#f1f5f9',
                 borderRadius: '50%',
                 transform: 'translate(50%, -50%)'
               }}></div>
@@ -288,7 +330,7 @@ const Login = () => {
                   <div style={{
                     width: '2.5rem',
                     height: '2.5rem',
-                    background: '#059669',
+                    background: '#1e3a8a',
                     borderRadius: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
@@ -310,7 +352,7 @@ const Login = () => {
                     </h2>
                     <p style={{
                       fontSize: '0.8rem',
-                      color: '#059669',
+                      color: '#1e3a8a',
                       margin: 0,
                       fontWeight: '600'
                     }}>
@@ -339,7 +381,7 @@ const Login = () => {
                     margin: '0 0 0.375rem 0',
                     textAlign: 'left'
                   }}>
-                    <strong style={{ color: '#1f2937' }}>🇫🇷 Français :</strong><br />
+                    <strong style={{ color: '#1f2937' }}>Français :</strong><br />
                     Système moderne et sécurisé pour la gestion des ressources humaines du personnel enseignant, administratif et contractuel
                   </p>
                   
@@ -352,7 +394,7 @@ const Login = () => {
                     direction: 'rtl',
                     fontFamily: 'Arial, "Traditional Arabic", serif'
                   }}>
-                    <strong style={{ color: '#1f2937' }}>🇲🇷 العربية :</strong><br />
+                    <strong style={{ color: '#1f2937' }}>العربية :</strong><br />
                     نظام حديث وآمن لإدارة الموارد البشرية للموظفين التعليميين والإداريين والمتعاقدين
                   </p>
                 </div>
@@ -363,9 +405,9 @@ const Login = () => {
                   gap: '0.375rem'
                 }}>
                   {[
-                    { icon: '🎓', label: 'Enseignants', color: '#059669' },
-                    { icon: '👥', label: 'Personnel', color: '#6b7280' },
-                    { icon: '📋', label: 'Contractuels', color: '#7c3aed' }
+                    { icon: 'Ens.', label: 'Enseignants', color: '#1e3a8a' },
+                    { icon: 'Pers.', label: 'Personnel', color: '#475569' },
+                    { icon: 'Contr.', label: 'Contractuels', color: '#1f2937' }
                   ].map((item, index) => (
                     <div key={index} style={{
                       padding: '0.375rem',
@@ -396,26 +438,192 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Formulaire de connexion */}
-          <div style={{
-            width: '300px',
-            flexShrink: 0
-          }}>
+          {/* Vue de sélection de rôle ou formulaire de connexion */}
+          {view === 'role' ? (
             <div style={{
-              background: 'white',
-              borderRadius: '0.75rem',
-              boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
-              overflow: 'hidden',
-              border: '1px solid #e2e8f0'
+              width: '400px',
+              flexShrink: 0
             }}>
-              {/* Header du formulaire */}
               <div style={{
-                background: '#059669',
-                padding: '1.5rem 1.25rem 1.25rem 1.25rem',
-                textAlign: 'center',
-                position: 'relative',
-                overflow: 'hidden'
+                background: 'white',
+                borderRadius: '0.75rem',
+                boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden',
+                border: '1px solid #e2e8f0'
               }}>
+                {/* Header */}
+                <div style={{
+                  background: '#1e3a8a',
+                  padding: '1.5rem 1.25rem 1.25rem 1.25rem',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)',
+                    opacity: 0.35
+                  }}></div>
+                  
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    background: 'white',
+                    borderRadius: '50%',
+                    margin: '0 auto 0.75rem auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    <UserGroupIcon style={{ width: '30px', height: '30px', color: '#1e3a8a' }} />
+                  </div>
+                  
+                  <h2 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '700',
+                    color: 'white',
+                    margin: '0 0 0.5rem 0',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    Choisissez votre rôle
+                  </h2>
+                  
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    margin: 0,
+                    fontWeight: '500',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    Sélectionnez votre type de compte
+                  </p>
+                </div>
+
+                {/* Options de rôle */}
+                <div style={{ padding: '1.5rem 1.25rem' }}>
+                  <button
+                    onClick={() => handleRoleSelect('employe')}
+                    style={{
+                      width: '100%',
+                      padding: '1rem',
+                      marginBottom: '1rem',
+                      background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '0.5rem',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                    }}
+                  >
+                    <UserIcon style={{ width: '1.5rem', height: '1.5rem' }} />
+                    <div style={{ textAlign: 'left', flex: 1 }}>
+                      <div style={{ fontSize: '1rem', fontWeight: '700' }}>{t('common.employe')}</div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.9 }}>Créer un compte employé</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => handleRoleSelect('other')}
+                    style={{
+                      width: '100%',
+                      padding: '1rem',
+                      background: 'white',
+                      color: '#374151',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0.5rem',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.borderColor = '#1e3a8a';
+                      e.target.style.color = '#1e3a8a';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.color = '#374151';
+                    }}
+                  >
+                    <BriefcaseIcon style={{ width: '1.5rem', height: '1.5rem' }} />
+                    <div style={{ textAlign: 'left', flex: 1 }}>
+                      <div style={{ fontSize: '1rem', fontWeight: '700' }}>Autre rôle</div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>Connexion avec identifiants</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Formulaire de connexion */
+            <div style={{
+              width: '300px',
+              flexShrink: 0
+            }}>
+              <div style={{
+                background: 'white',
+                borderRadius: '0.75rem',
+                boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden',
+                border: '1px solid #e2e8f0'
+              }}>
+                {/* Header du formulaire */}
+                <div style={{
+                  background: '#1e3a8a',
+                  padding: '1.5rem 1.25rem 1.25rem 1.25rem',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <button
+                    onClick={() => setView('role')}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      left: '1rem',
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      border: 'none',
+                      borderRadius: '0.375rem',
+                      padding: '0.5rem',
+                      cursor: 'pointer',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '2rem',
+                      height: '2rem'
+                    }}
+                    title="Retour à la sélection de rôle"
+                  >
+                    ←
+                  </button>
                 <div style={{
                   position: 'absolute',
                   top: 0,
@@ -530,7 +738,7 @@ const Login = () => {
                         }}
                         placeholder="Entrez votre nom d'utilisateur"
                         onFocus={(e) => {
-                          e.target.style.borderColor = '#059669';
+                          e.target.style.borderColor = '#1e3a8a';
                           e.target.style.backgroundColor = 'white';
                           e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1)';
                         }}
@@ -590,7 +798,7 @@ const Login = () => {
                         }}
                         placeholder="Entrez votre mot de passe"
                         onFocus={(e) => {
-                          e.target.style.borderColor = '#059669';
+                          e.target.style.borderColor = '#1e3a8a';
                           e.target.style.backgroundColor = 'white';
                           e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1)';
                         }}
@@ -660,7 +868,7 @@ const Login = () => {
                       padding: '1rem',
                       background: isSubmitting 
                         ? '#9ca3af' 
-                        : '#059669',
+                        : '#1e3a8a',
                       color: 'white',
                       border: 'none',
                       borderRadius: '0.75rem',
@@ -680,14 +888,14 @@ const Login = () => {
                     }}
                     onMouseEnter={(e) => {
                       if (!isSubmitting) {
-                        e.target.style.background = '#047857';
+                        e.target.style.background = '#1e40af';
                         e.target.style.transform = 'translateY(-1px)';
                         e.target.style.boxShadow = '0 6px 16px rgba(5, 150, 105, 0.4)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isSubmitting) {
-                        e.target.style.background = '#059669';
+                        e.target.style.background = '#1e3a8a';
                         e.target.style.transform = 'translateY(0)';
                         e.target.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.3)';
                       }
@@ -723,6 +931,30 @@ const Login = () => {
                 padding: '1rem',
                 borderTop: '1px solid #e2e8f0'
               }}>
+                {selectedRole === 'employe' && (
+                  <p style={{ 
+                    margin: '0 0 0.75rem 0', 
+                    fontSize: '0.75rem',
+                    color: '#6b7280'
+                  }}>
+                    Vous n'avez pas encore de compte ?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setView('register')}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#1e3a8a',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '0.75rem'
+                      }}
+                    >
+                      Créer un compte
+                    </button>
+                  </p>
+                )}
                 <p style={{ 
                   margin: '0 0 0.125rem 0', 
                   fontWeight: '600',
@@ -741,11 +973,12 @@ const Login = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 
       {/* Styles CSS pour les animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }

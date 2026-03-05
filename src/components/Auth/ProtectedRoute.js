@@ -1,12 +1,12 @@
+// Traduit automatiquement
 // src/components/Auth/ProtectedRoute.js - VERSION AMÉLIORÉE COMPATIBLE
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-
 const ProtectedRoute = ({ 
   children, 
   requiredRole, 
-  allowedRoles = [], // Support pour plusieurs rôles
+  allowedRoles = [], // Support pour plusieurs rô
   requiredPermission, 
   fallback = '/login' 
 }) => {
@@ -18,7 +18,7 @@ const ProtectedRoute = ({
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+        background: '#f1f5f9',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -30,8 +30,8 @@ const ProtectedRoute = ({
           <div style={{
             width: '4rem',
             height: '4rem',
-            border: '4px solid rgba(255, 255, 255, 0.3)',
-            borderTop: '4px solid #FFC107',
+            border: '4px solid #e2e8f0',
+            borderTop: '4px solid #1e3a8a',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
             margin: '0 auto 1.5rem'
@@ -90,7 +90,7 @@ const ProtectedRoute = ({
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+        background: '#f1f5f9',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -103,8 +103,8 @@ const ProtectedRoute = ({
           borderRadius: '16px',
           padding: '2rem',
           textAlign: 'center',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-          border: '4px solid #FFC107'
+          boxShadow: '0 10px 20px rgba(15, 23, 42, 0.08)',
+          border: '1px solid #cbd5e1'
         }}>
           {/* Header avec logo */}
           <div style={{
@@ -113,19 +113,19 @@ const ProtectedRoute = ({
             <div style={{
               width: '80px',
               height: '80px',
-              backgroundColor: '#fee2e2',
+              backgroundColor: '#e2e8f0',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1rem',
-              border: '3px solid #dc2626'
+              border: '3px solid #cbd5e1'
             }}>
               <span style={{
                 fontSize: '2rem',
-                color: '#dc2626'
+                color: '#1e3a8a'
               }}>
-                🚫
+                !
               </span>
             </div>
             
@@ -171,7 +171,7 @@ const ProtectedRoute = ({
                 <p style={{
                   fontSize: '1rem',
                   fontWeight: '600',
-                  color: '#2E7D32',
+                  color: '#1e3a8a',
                   margin: 0,
                   textTransform: 'capitalize'
                 }}>
@@ -191,7 +191,7 @@ const ProtectedRoute = ({
                 <p style={{
                   fontSize: '1rem',
                   fontWeight: '600',
-                  color: '#dc2626',
+                  color: '#b91c1c',
                   margin: 0,
                   textTransform: 'capitalize'
                 }}>
@@ -236,7 +236,7 @@ const ProtectedRoute = ({
               onClick={() => window.location.href = '/dashboard'}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#2E7D32',
+                backgroundColor: '#1e3a8a',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -246,15 +246,15 @@ const ProtectedRoute = ({
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#1B5E20';
+                e.target.style.backgroundColor = '#1e40af';
                 e.target.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#2E7D32';
+                e.target.style.backgroundColor = '#1e3a8a';
                 e.target.style.transform = 'translateY(0)';
               }}
             >
-              📊 Dashboard
+              Tableau de bord
             </button>
           </div>
 

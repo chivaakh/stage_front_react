@@ -402,3 +402,41 @@ body {
     var(--primary-green) 100%
   );
 }
+
+/* Styles d'impression pour masquer l'en-tête et le footer du site */
+@media print {
+  /* Masquer tous les en-têtes, nav et footers */
+  header,
+  nav,
+  footer,
+  [role="banner"],
+  [role="navigation"],
+  [role="contentinfo"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Masquer les éléments de navigation du site */
+  body > div > div > header,
+  body > div > div > nav,
+  body > div > div > footer,
+  body > div > header,
+  body > div > nav,
+  body > div > footer {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Configuration de la page */
+  @page {
+    margin: 0.2cm;
+    size: A4 portrait;
+  }
+  
+  /* Styles pour le body lors de l'impression */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+}

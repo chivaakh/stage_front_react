@@ -1,7 +1,8 @@
+// Traduit automatiquement
 import React, { useState } from 'react';
-import { authService, apiService } from '../services/api';
-
+import { useLanguage } from '../contexts/LanguageContext';
 const TestConnection = () => {
+  const { t, } = useLanguage();
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +24,7 @@ const TestConnection = () => {
       } else {
         setResult('❌ Erreur: ' + response.status + ' - ' + response.statusText);
       }
-    } catch (error) {
+} catch (error) {
       setResult('❌ Erreur de connexion: ' + error.message);
     }
     

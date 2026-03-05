@@ -1,15 +1,18 @@
+// Traduit automatiquement
 // src/components/ChefPAT/PATList.js - VERSION COMPLÈTE ET STYLÉE
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { apiService } from '../../services/api';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import CreatePATForm from './CreatePATForm';
 import EditPATForm from './EditPATForm';
 import PATDetail from './PATDetail';
-
 const PATList = () => {
+  const { t, isArabic } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [personnelPAT, setPersonnelPAT] = useState([]);
   const [filteredPAT, setFilteredPAT] = useState([]);
+
   const [error, setError] = useState(null);
   
   // États pour les modales
@@ -58,7 +61,7 @@ const PATList = () => {
       
     } catch (err) {
       console.error('❌ Erreur chargement PAT:', err);
-      setError('Erreur lors du chargement du personnel PAT');
+      setError(t('common.erreurChargement') + ' du personnel PAT');
     } finally {
       setLoading(false);
     }
@@ -530,7 +533,7 @@ const PATList = () => {
                   backgroundColor: 'white'
                 }}
               >
-                <option value="nom">Nom</option>
+                <option value="nom">{t('common.nom')}</option>
                 <option value="poste">Poste</option>
                 <option value="grade">Grade</option>
                 <option value="indice">Indice</option>
@@ -626,7 +629,7 @@ const PATList = () => {
                     color: '#111827',
                     margin: '0 0 0.25rem 0'
                   }}>
-                    {pat.personne_nom_complet || 
+                    {pat.personne_nom_complet ||
                      `${pat.personne_prenom || 'N/A'} ${pat.personne_nom || 'N/A'}`}
                   </h3>
                   <p style={{

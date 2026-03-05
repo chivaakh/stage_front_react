@@ -1,7 +1,10 @@
+// Traduit automatiquement
 // src/components/ChefEnseignant/AbsencesManagement.js - VERSION STYLE MODERNE
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
+import CreateAbsenceForm from '../Common/CreateAbsenceForm';
 import {
   ClockIcon,
   CalendarDaysIcon,
@@ -12,15 +15,16 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
   UserIcon,
-  MagnifyingGlassIcon,
   FunnelIcon,
   ChatBubbleLeftIcon,
   ArrowLeftIcon,
   PlusIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const AbsencesManagement = () => {
+  const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [absences, setAbsences] = useState([]);
   const [filteredAbsences, setFilteredAbsences] = useState([]);
@@ -34,6 +38,7 @@ const AbsencesManagement = () => {
   const [modalType, setModalType] = useState('');
   const [commentaire, setCommentaire] = useState('');
   const [motifRefus, setMotifRefus] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Chargement des absences (fonctionnalité conservée)
   useEffect(() => {
@@ -49,13 +54,13 @@ const AbsencesManagement = () => {
 
         const response = await apiService.getAbsences(params);
         const absencesData = response.results || response || [];
-        
+
         setAbsences(absencesData);
         setFilteredAbsences(absencesData);
 
       } catch (err) {
-        console.error('❌ Erreur lors du chargement des absences:', err);
-        setError(err.response?.data?.detail || err.message || 'Erreur lors du chargement des absences');
+        console.error('❌ Erreur chargement des absences:', err);
+        setError(err.response?.data?.detail || err.message || 'Erreur de chargement des absences');
         setAbsences([]);
         setFilteredAbsences([]);
       } finally {
@@ -77,14 +82,14 @@ const AbsencesManagement = () => {
     try {
       await apiService.approuverAbsence(absenceId, commentaireApprobation || 'Approuvé par le chef de service enseignant');
 
-      setAbsences(prev => prev.map(a => 
-        a.id === absenceId 
+      setAbsences(prev => prev.map(a =>
+        a.id === absenceId
           ? { ...a, statut: 'APPROUVÉ', approuve_par_nom: user.username, commentaire_approbateur: commentaireApprobation }
           : a
       ));
-      
-      setFilteredAbsences(prev => prev.map(a => 
-        a.id === absenceId 
+
+      setFilteredAbsences(prev => prev.map(a =>
+        a.id === absenceId
           ? { ...a, statut: 'APPROUVÉ', approuve_par_nom: user.username, commentaire_approbateur: commentaireApprobation }
           : a
       ));
@@ -92,7 +97,7 @@ const AbsencesManagement = () => {
       setShowModal(false);
       setSelectedAbsence(null);
       setCommentaire('');
-      
+
     } catch (err) {
       console.error('❌ Erreur lors de l\'approbation:', err);
       setError('Erreur lors de l\'approbation de l\'absence');
@@ -103,14 +108,14 @@ const AbsencesManagement = () => {
     try {
       await apiService.refuserAbsence(absenceId, motifRefusAbsence || 'Refusé par le chef de service enseignant');
 
-      setAbsences(prev => prev.map(a => 
-        a.id === absenceId 
+      setAbsences(prev => prev.map(a =>
+        a.id === absenceId
           ? { ...a, statut: 'REFUSÉ', approuve_par_nom: user.username, motif_refus: motifRefusAbsence }
           : a
       ));
 
-      setFilteredAbsences(prev => prev.map(a => 
-        a.id === absenceId 
+      setFilteredAbsences(prev => prev.map(a =>
+        a.id === absenceId
           ? { ...a, statut: 'REFUSÉ', approuve_par_nom: user.username, motif_refus: motifRefusAbsence }
           : a
       ));
@@ -118,7 +123,7 @@ const AbsencesManagement = () => {
       setShowModal(false);
       setSelectedAbsence(null);
       setMotifRefus('');
-      
+
     } catch (err) {
       console.error('❌ Erreur lors du refus:', err);
       setError('Erreur lors du refus de l\'absence');
@@ -175,12 +180,12 @@ const AbsencesManagement = () => {
 
   const formatDuree = (dateDebut, dateFin) => {
     if (!dateDebut || !dateFin) return 'N/A';
-    
+
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
     const diffTime = Math.abs(fin - debut);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    
+
     return `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
   };
 
@@ -229,7 +234,7 @@ const AbsencesManagement = () => {
             Récupération des données en cours...
           </p>
         </div>
-        <style jsx>{`
+        <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -280,13 +285,13 @@ const AbsencesManagement = () => {
               </p>
             </div>
           </div>
-          
+
           <div style={{
             display: 'flex',
             gap: '1rem',
             justifyContent: 'center'
           }}>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               style={{
                 background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
@@ -311,7 +316,7 @@ const AbsencesManagement = () => {
             >
               Réessayer
             </button>
-            <button 
+            <button
               onClick={() => window.location.href = '/dashboard'}
               style={{
                 background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
@@ -349,7 +354,7 @@ const AbsencesManagement = () => {
       padding: '2rem 1rem'
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        
+
         {/* Header moderne */}
         <div style={{
           background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
@@ -371,7 +376,7 @@ const AbsencesManagement = () => {
             borderRadius: '50%',
             transform: 'translate(50px, -50px)'
           }}></div>
-          
+
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -403,7 +408,7 @@ const AbsencesManagement = () => {
               >
                 <ArrowLeftIcon style={{ width: '1.25rem', height: '1.25rem' }} />
               </button>
-              
+
               <div>
                 <div style={{
                   display: 'flex',
@@ -436,7 +441,7 @@ const AbsencesManagement = () => {
                 </p>
               </div>
             </div>
-            
+
             <div style={{
               background: 'rgba(251, 191, 36, 0.2)',
               border: '1px solid rgba(251, 191, 36, 0.3)',
@@ -472,23 +477,23 @@ const AbsencesManagement = () => {
           marginBottom: '2rem'
         }}>
           {[
-            { 
-              count: statsAbsences.enAttente, 
-              label: 'En attente', 
+            {
+              count: statsAbsences.enAttente,
+              label: 'En attente',
               color: '#f59e0b',
               bgColor: '#fef3c7',
               icon: ClockIcon
             },
-            { 
-              count: statsAbsences.approuvees, 
-              label: 'Approuvées', 
+            {
+              count: statsAbsences.approuvees,
+              label: 'Approuvées',
               color: '#10b981',
               bgColor: '#d1fae5',
               icon: CheckIcon
             },
-            { 
-              count: statsAbsences.refusees, 
-              label: 'Refusées', 
+            {
+              count: statsAbsences.refusees,
+              label: 'Refusées',
               color: '#ef4444',
               bgColor: '#fee2e2',
               icon: XMarkIcon
@@ -584,7 +589,7 @@ const AbsencesManagement = () => {
               Filtres et recherche
             </h3>
           </div>
-          
+
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'minmax(300px, 2fr) 1fr 1fr',
@@ -648,9 +653,7 @@ const AbsencesManagement = () => {
                 fontWeight: '600',
                 color: '#374151',
                 marginBottom: '0.5rem'
-              }}>
-                Statut
-              </label>
+              }}>{t('common.statut')}</label>
               <select
                 value={selectedStatut}
                 onChange={(e) => setSelectedStatut(e.target.value)}
@@ -675,10 +678,10 @@ const AbsencesManagement = () => {
                 }}
               >
                 <option value="">Tous les statuts</option>
-                <option value="EN_ATTENTE">En attente</option>
-                <option value="APPROUVÉ">Approuvé</option>
-                <option value="REFUSÉ">Refusé</option>
-                <option value="ANNULÉ">Annulé</option>
+                <option value="EN_ATTENTE">{t('common.enAttente')}</option>
+                <option value="APPROUVÉ">{t('common.approuve')}</option>
+                <option value="REFUSÉ">{t('common.refuse')}</option>
+                <option value="ANNULÉ">{t('common.annule')}</option>
               </select>
             </div>
 
@@ -783,8 +786,8 @@ const AbsencesManagement = () => {
                 <div>Type d'absence</div>
                 <div>Période</div>
                 <div>Durée</div>
-                <div>Statut</div>
-                <div style={{ textAlign: 'center' }}>Actions</div>
+                <div>{t('common.statut')}</div>
+                <div style={{ textAlign: 'center' }}>{t('common.actions')}</div>
               </div>
 
               {/* Lignes du tableau */}
@@ -1165,7 +1168,7 @@ const AbsencesManagement = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 {selectedAbsence.motif_demande && (
                   <div style={{ marginTop: '1.5rem' }}>
                     <p style={{
@@ -1273,13 +1276,13 @@ const AbsencesManagement = () => {
               {/* Affichage des informations de traitement si déjà traité */}
               {modalType === 'view' && selectedAbsence.statut !== 'EN_ATTENTE' && (
                 <div style={{
-                  background: selectedAbsence.statut === 'APPROUVÉ' 
+                  background: selectedAbsence.statut === 'APPROUVÉ'
                     ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)'
                     : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
                   borderRadius: '16px',
                   padding: '1.5rem',
                   marginBottom: '2rem',
-                  border: selectedAbsence.statut === 'APPROUVÉ' 
+                  border: selectedAbsence.statut === 'APPROUVÉ'
                     ? '1px solid #10b981'
                     : '1px solid #ef4444'
                 }}>
@@ -1303,7 +1306,7 @@ const AbsencesManagement = () => {
                       Demande {selectedAbsence.statut.toLowerCase()}e
                     </p>
                   </div>
-                  
+
                   {selectedAbsence.approuve_par_nom && (
                     <p style={{
                       fontSize: '0.875rem',
@@ -1314,7 +1317,7 @@ const AbsencesManagement = () => {
                       Par: {selectedAbsence.approuve_par_nom}
                     </p>
                   )}
-                  
+
                   {selectedAbsence.commentaire_approbateur && (
                     <p style={{
                       fontSize: '0.875rem',
@@ -1325,7 +1328,7 @@ const AbsencesManagement = () => {
                       <strong>Commentaire:</strong> {selectedAbsence.commentaire_approbateur}
                     </p>
                   )}
-                  
+
                   {selectedAbsence.motif_refus && (
                     <p style={{
                       fontSize: '0.875rem',
@@ -1370,7 +1373,7 @@ const AbsencesManagement = () => {
                     e.target.style.boxShadow = '0 4px 6px -1px rgba(100, 116, 139, 0.3)';
                   }}
                 >
-                  {modalType === 'view' ? 'Fermer' : 'Annuler'}
+                  {modalType === 'view' ? t('common.fermer') : t('common.annuler')}
                 </button>
 
                 {modalType === 'approve' && (
@@ -1417,7 +1420,7 @@ const AbsencesManagement = () => {
                     disabled={!motifRefus.trim()}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: !motifRefus.trim() 
+                      background: !motifRefus.trim()
                         ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
                         : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                       color: 'white',
@@ -1430,7 +1433,7 @@ const AbsencesManagement = () => {
                       alignItems: 'center',
                       gap: '0.5rem',
                       transition: 'all 0.2s',
-                      boxShadow: !motifRefus.trim() 
+                      boxShadow: !motifRefus.trim()
                         ? '0 4px 6px -1px rgba(156, 163, 175, 0.3)'
                         : '0 4px 6px -1px rgba(239, 68, 68, 0.3)'
                     }}
@@ -1496,6 +1499,33 @@ const AbsencesManagement = () => {
           </p>
         </div>
       </div>
+
+      {/* Formulaire de création d'absence */}
+      {showCreateForm && (
+        <CreateAbsenceForm
+          onClose={() => setShowCreateForm(false)}
+          onSuccess={() => {
+            setShowCreateForm(false);
+            // Recharger les absences
+            const fetchAbsences = async () => {
+              try {
+                const params = {};
+                if (searchTerm) params.search = searchTerm;
+                if (selectedStatut) params.statut = selectedStatut;
+                if (selectedType) params.type_absence = selectedType;
+
+                const response = await apiService.getAbsences(params);
+                const absencesData = response.results || response || [];
+                setAbsences(absencesData);
+                setFilteredAbsences(absencesData);
+              } catch (err) {
+                console.error('Erreur rechargement:', err);
+              }
+            };
+            fetchAbsences();
+          }}
+        />
+      )}
     </div>
   );
 };

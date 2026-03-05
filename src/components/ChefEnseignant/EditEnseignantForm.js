@@ -1,4 +1,6 @@
+// Traduit automatiquement
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import {
@@ -14,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
+  const { t, isArabic } = useLanguage();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -60,7 +63,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
         const servicesResponse = await apiService.get('/services/');
         setServices(servicesResponse.data.results || servicesResponse.data || []);
 
-        const enseignantResponse = await apiService.get(`/enseignants/${enseignantId}/`);
+        const enseignantResponse = await apiService.get('/enseignants/${enseignantId}/');
         const enseignant = enseignantResponse.data;
 
         setFormData({
@@ -92,7 +95,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
 
       } catch (err) {
         console.error('❌ Erreur chargement données:', err);
-        setError(err.response?.data?.detail || 'Erreur lors du chargement des données');
+      setError(err.response?.data?.detail || `${t('common.erreurChargement')} des données`);
       } finally {
         setIsLoading(false);
       }
@@ -315,7 +318,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
             Récupération des informations...
           </p>
         </div>
-        <style jsx>{`
+        <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -376,9 +379,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
                 color: '#374151'
               }}
             >
-              <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-              Retour
-            </button>
+              <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.retour')}</button>
             <div>
               <h2 style={{
                 fontSize: '1.5rem',
@@ -991,9 +992,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
                           gap: '0.5rem'
                         }}
                       >
-                        <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />
-                        Précédent
-                      </button>
+                        <ArrowLeftIcon style={{ width: '1rem', height: '1rem' }} />{t('common.precedent')}</button>
                     )}
                   </div>
 
@@ -1024,9 +1023,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
                           alignItems: 'center',
                           gap: '0.5rem'
                         }}
-                      >
-                        Suivant
-                        <ArrowLeftIcon style={{
+                      >{t('common.suivant')}<ArrowLeftIcon style={{
                           width: '1rem',
                           height: '1rem',
                           transform: 'rotate(180deg)'
@@ -1079,7 +1076,7 @@ const EditEnseignantForm = ({ enseignantId, onCancel, onSuccess }) => {
         </div>
       </div>
       
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }

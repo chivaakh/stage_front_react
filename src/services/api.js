@@ -23,6 +23,13 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       console.log('🔑 Token ajouté à la requête:', config.method?.toUpperCase(), config.url);
     }
+    
+    // Si les données sont FormData, supprimer Content-Type pour laisser Axios le définir automatiquement
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+      console.log('📎 FormData détecté, Content-Type sera défini automatiquement');
+    }
+    
     return config;
   },
   (error) => {
@@ -87,9 +94,12 @@ export const authService = {
       console.log('🔐 Tentative de connexion...', credentials.username);
       const response = await api.post('/auth/login/', credentials);
       console.log('✅ Réponse de connexion:', response.data);
+
       
       const { access, refresh, user } = response.data;
-
+      console.log('✅ Réponse de connexion:', response.data);
+      console.log('✅ Réponse de connexion:', access);
+      
       // Stocker les tokens et les infos utilisateur
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
@@ -98,6 +108,8 @@ export const authService = {
       console.log('✅ Connexion réussie pour:', user.username, 'Rôle:', user.role);
       
       return { success: true, user, tokens: { access, refresh } };
+      // goulilou 3anou leyn yl7ag hun yderigik vers l'url /dashboard
+
     } catch (error) {
       console.error('❌ Erreur de connexion:', error.response?.data || error.message);
       return { 
@@ -173,10 +185,22 @@ export const apiService = {
   // ===== DASHBOARD =====
   async getDashboard(type = 'auto') {
     try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        throw new Error('Token d\'authentification manquant');
+      }
+      
       const response = await api.get(`/dashboard/${type}/`);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getDashboard:', error);
+      console.error('❌ Détails de l\'erreur:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        url: error.config?.url,
+        method: error.config?.method
+      });
       throw error;
     }
   },
@@ -184,7 +208,9 @@ export const apiService = {
   // ===== UTILISATEURS =====
   async getUsers(params = {}) {
     try {
+      console.log('👥 Récupération des utilisateurs avec params:', params);
       const response = await api.get('/users/', { params });
+      console.log('✅ Utilisateurs récupérés:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getUsers:', error);
@@ -192,13 +218,133 @@ export const apiService = {
     }
   },
 
+  async getUser(id) {
+    try {
+      console.log('👁️ Récupération utilisateur ID:', id);
+      const response = await api.get(`/users/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getUser:', error);
+      throw error;
+    }
+  },
+
+  async createUser(userData) {
+    try {
+      console.log('➕ Création nouvel utilisateur:', userData);
+      const response = await api.post('/users/', userData);
+      console.log('✅ Utilisateur créé:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createUser:', error);
+      throw error;
+    }
+  },
+
+  async createChefService(chefData) {
+    try {
+      console.log('👔 Création chef de service:', chefData);
+      const response = await api.post('/users/create_chef_service/', chefData);
+      console.log('✅ Chef de service créé:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createChefService:', error);
+      throw error;
+    }
+  },
+
+  async updateUser(id, userData) {
+    try {
+      console.log('✏️ Modification utilisateur ID:', id, userData);
+      const response = await api.put(`/users/${id}/`, userData);
+      console.log('✅ Utilisateur modifié:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur updateUser:', error);
+      throw error;
+    }
+  },
+
+  async deleteUser(id) {
+    try {
+      console.log('🗑️ Suppression utilisateur ID:', id);
+      const response = await api.delete(`/users/${id}/`);
+      console.log('✅ Utilisateur supprimé');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur deleteUser:', error);
+      throw error;
+    }
+  },
+
   // ===== SERVICES =====
   async getServices(params = {}) {
     try {
+      console.log('🏛️ Récupération des services avec params:', params);
       const response = await api.get('/services/', { params });
+      console.log('✅ Services récupérés:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getServices:', error);
+      throw error;
+    }
+  },
+
+  async getService(id) {
+    try {
+      console.log('👁️ Récupération service ID:', id);
+      const response = await api.get(`/services/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getService:', error);
+      throw error;
+    }
+  },
+
+  async createService(serviceData) {
+    try {
+      console.log('➕ Création nouveau service:', serviceData);
+      const response = await api.post('/services/', serviceData);
+      console.log('✅ Service créé:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createService:', error);
+      throw error;
+    }
+  },
+
+  async updateService(id, serviceData) {
+    try {
+      console.log('✏️ Modification service ID:', id, serviceData);
+      const response = await api.put(`/services/${id}/`, serviceData);
+      console.log('✅ Service modifié:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur updateService:', error);
+      throw error;
+    }
+  },
+
+  async deleteService(id) {
+    try {
+      console.log('🗑️ Suppression service ID:', id);
+      const response = await api.delete(`/services/${id}/`);
+      console.log('✅ Service supprimé');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur deleteService:', error);
+      throw error;
+    }
+  },
+
+  async assignerChefService(serviceId, userId) {
+    try {
+      console.log('👔 Assignation chef de service:', serviceId, userId);
+      const response = await api.post(`/services/${serviceId}/assigner_chef/`, { chef_service_id: userId });
+      console.log('✅ Chef assigné:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur assignerChefService:', error);
       throw error;
     }
   },
@@ -413,10 +559,15 @@ export const apiService = {
     }
   },
 
-  async createAbsence(absenceData) {
+  async createAbsence(absenceData, isFormData = false) {
     try {
       console.log('➕ Création nouvelle absence:', absenceData);
-      const response = await api.post('/absences/', absenceData);
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      } : {};
+      const response = await api.post('/absences/', absenceData, config);
       console.log('✅ Absence créée:', response.data);
       return response.data;
     } catch (error) {
@@ -553,10 +704,59 @@ export const apiService = {
   // ===== CONTRACTUELS =====
   async getContractuels(params = {}) {
     try {
+      console.log('📋 Récupération des contractuels avec params:', params);
       const response = await api.get('/contractuels/', { params });
+      console.log('✅ Contractuels récupérés:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getContractuels:', error);
+      throw error;
+    }
+  },
+
+  async getContractuel(id) {
+    try {
+      console.log('👁️ Récupération contractuel ID:', id);
+      const response = await api.get(`/contractuels/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getContractuel:', error);
+      throw error;
+    }
+  },
+
+  async createContractuel(contractuelData) {
+    try {
+      console.log('➕ Création nouveau contractuel:', contractuelData);
+      const response = await api.post('/contractuels/', contractuelData);
+      console.log('✅ Contractuel créé:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createContractuel:', error);
+      throw error;
+    }
+  },
+
+  async updateContractuel(id, contractuelData) {
+    try {
+      console.log('✏️ Modification contractuel ID:', id, contractuelData);
+      const response = await api.put(`/contractuels/${id}/`, contractuelData);
+      console.log('✅ Contractuel modifié:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur updateContractuel:', error);
+      throw error;
+    }
+  },
+
+  async deleteContractuel(id) {
+    try {
+      console.log('🗑️ Suppression contractuel ID:', id);
+      const response = await api.delete(`/contractuels/${id}/`);
+      console.log('✅ Contractuel supprimé');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur deleteContractuel:', error);
       throw error;
     }
   },
@@ -594,11 +794,8 @@ export const apiService = {
 
   async uploadDocument(documentData) {
     try {
-      const response = await api.post('/documents/', documentData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // Ne pas définir Content-Type manuellement pour FormData, Axios le gère automatiquement
+      const response = await api.post('/documents/', documentData);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur uploadDocument:', error);
@@ -609,7 +806,9 @@ export const apiService = {
   // ===== PAIES =====
   async getPaies(params = {}) {
     try {
+      console.log('💰 Récupération des paies avec params:', params);
       const response = await api.get('/paies/', { params });
+      console.log('✅ Paies récupérées:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getPaies:', error);
@@ -617,12 +816,116 @@ export const apiService = {
     }
   },
 
+  async getPaie(id) {
+    try {
+      console.log('👁️ Récupération paie ID:', id);
+      const response = await api.get(`/paies/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getPaie:', error);
+      throw error;
+    }
+  },
+
+  async createPaie(paieData) {
+    try {
+      console.log('➕ Création nouvelle paie:', paieData);
+      const response = await api.post('/paies/', paieData);
+      console.log('✅ Paie créée:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur createPaie:', error);
+      throw error;
+    }
+  },
+
+  async updatePaie(id, paieData) {
+    try {
+      console.log('✏️ Modification paie ID:', id, paieData);
+      const response = await api.put(`/paies/${id}/`, paieData);
+      console.log('✅ Paie modifiée:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur updatePaie:', error);
+      throw error;
+    }
+  },
+
+  async deletePaie(id) {
+    try {
+      console.log('🗑️ Suppression paie ID:', id);
+      const response = await api.delete(`/paies/${id}/`);
+      console.log('✅ Paie supprimée');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur deletePaie:', error);
+      throw error;
+    }
+  },
+
   async getResumeMensuelPaie(mois) {
     try {
+      console.log('📊 Récupération résumé mensuel pour:', mois);
       const response = await api.get('/paies/resume_mensuel/', { params: { mois } });
+      console.log('✅ Résumé mensuel récupéré:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur getResumeMensuelPaie:', error);
+      throw error;
+    }
+  },
+
+  // Calcul automatique selon les lois mauritaniennes
+  async calculerPaie(paieData) {
+    try {
+      console.log('🧮 Calcul automatique de la paie:', paieData);
+      // Cette méthode calcule automatiquement :
+      // - Allocations familiales (selon nb_enfants)
+      // - Déductions (cotisations sociales, impôts)
+      // - Salaire net = salaire_brut + allocations - déductions
+      
+      const salaireBrut = parseFloat(paieData.salaire_brut) || 0;
+      const nbEnfants = parseInt(paieData.nb_enfants) || 0;
+      
+      // Allocations familiales mauritaniennes : ~5000 MRU par enfant (à ajuster selon la législation)
+      const allocationParEnfant = 5000;
+      const allocationsFamiliales = nbEnfants * allocationParEnfant;
+      
+      // Déductions mauritaniennes :
+      // - Cotisation sociale : 5% du salaire brut
+      // - Retraite : 3% du salaire brut
+      // - Impôt sur le revenu : progressif selon tranches
+      const cotisationSociale = salaireBrut * 0.05;
+      const retraite = salaireBrut * 0.03;
+      
+      // Calcul impôt progressif (exemple simplifié)
+      let impot = 0;
+      if (salaireBrut > 50000) {
+        impot = (salaireBrut - 50000) * 0.20; // 20% au-delà de 50000 MRU
+      }
+      if (salaireBrut > 30000 && salaireBrut <= 50000) {
+        impot = (salaireBrut - 30000) * 0.15; // 15% entre 30000 et 50000
+      }
+      if (salaireBrut > 15000 && salaireBrut <= 30000) {
+        impot = (salaireBrut - 15000) * 0.10; // 10% entre 15000 et 30000
+      }
+      
+      const deductions = cotisationSociale + retraite + impot;
+      const salaireNet = salaireBrut + allocationsFamiliales - deductions;
+      
+      return {
+        salaire_brut: salaireBrut,
+        salaire_net: Math.max(0, salaireNet), // Ne peut pas être négatif
+        allocations_familiales: allocationsFamiliales,
+        deductions: deductions,
+        details_deductions: {
+          cotisation_sociale: cotisationSociale,
+          retraite: retraite,
+          impot: impot
+        }
+      };
+    } catch (error) {
+      console.error('❌ Erreur calculPaie:', error);
       throw error;
     }
   },
@@ -837,6 +1140,223 @@ export const apiService = {
     } catch (error) {
       console.error('❌ Problème de santé de l\'API:', error);
       return { status: 'error', message: error.message };
+    }
+  },
+
+  // ===== RAPPORTS ET STATISTIQUES =====
+  async getStatistiquesAbsences() {
+    try {
+      console.log('📊 Récupération statistiques absences...');
+      const response = await api.get('/absences/statistiques/');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getStatistiquesAbsences:', error);
+      throw error;
+    }
+  },
+
+  async getDashboardAdminRH() {
+    try {
+      console.log('👑 Récupération dashboard Admin RH...');
+      const response = await api.get('/dashboard/admin_rh/');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getDashboardAdminRH:', error);
+      throw error;
+    }
+  },
+
+  async getComparaisonPeriodes(params) {
+    try {
+      console.log('📈 Comparaison périodes:', params);
+      const response = await api.get('/statistiques/comparaison_periodes/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erreur getComparaisonPeriodes:', error);
+      throw error;
+    }
+  },
+
+  async getRapportEffectif(params = {}) {
+    try {
+      console.log('👥 Génération rapport effectif...');
+      const [enseignants, pat, contractuels, services] = await Promise.all([
+        this.getEnseignants(),
+        this.getPersonnelPAT(),
+        this.getContractuels(),
+        this.get('/services/')
+      ]);
+
+      const enseignantsData = enseignants.results || enseignants || [];
+      const patData = pat.results || pat || [];
+      const contractuelsData = contractuels.results || contractuels || [];
+      const servicesData = services.data?.results || services.data || [];
+
+      const totalEmployes = enseignantsData.length + patData.length + contractuelsData.length;
+      
+      const effectifParService = servicesData.map(service => {
+        const enseignantsService = enseignantsData.filter(e => 
+          e.personne?.service === service.id || e.service === service.id
+        ).length;
+        const patService = patData.filter(p => 
+          p.personne?.service === service.id || p.service === service.id
+        ).length;
+        const contractuelsService = contractuelsData.filter(c => 
+          c.personne?.service === service.id || c.service === service.id
+        ).length;
+        
+        return {
+          service: service.nom,
+          type: service.type_service,
+          enseignants: enseignantsService,
+          pat: patService,
+          contractuels: contractuelsService,
+          total: enseignantsService + patService + contractuelsService
+        };
+      });
+
+      const effectifParType = {
+        enseignants: enseignantsData.length,
+        pat: patData.length,
+        contractuels: contractuelsData.length,
+        total: totalEmployes
+      };
+
+      return {
+        total_employes: totalEmployes,
+        par_service: effectifParService,
+        par_type: effectifParType,
+        services: servicesData.length
+      };
+    } catch (error) {
+      console.error('❌ Erreur getRapportEffectif:', error);
+      throw error;
+    }
+  },
+
+  async getRapportTurnover(params = {}) {
+    try {
+      console.log('🔄 Génération rapport turnover...');
+      const contractuels = await this.getContractuels();
+      const contractuelsData = contractuels.results || contractuels || [];
+      
+      const aujourdHui = new Date();
+      const ilYASixMois = new Date(aujourdHui);
+      ilYASixMois.setMonth(ilYASixMois.getMonth() - 6);
+      
+      const contratsExpires = contractuelsData.filter(c => {
+        if (!c.date_fin_contrat) return false;
+        const dateFin = new Date(c.date_fin_contrat);
+        return dateFin >= ilYASixMois && dateFin <= aujourdHui;
+      });
+
+      const nouveauxContrats = contractuelsData.filter(c => {
+        if (!c.date_debut_contrat) return false;
+        const dateDebut = new Date(c.date_debut_contrat);
+        return dateDebut >= ilYASixMois && dateDebut <= aujourdHui;
+      });
+
+      const dansTroisMois = new Date(aujourdHui);
+      dansTroisMois.setMonth(dansTroisMois.getMonth() + 3);
+      
+      const contratsExpirantBientot = contractuelsData.filter(c => {
+        if (!c.date_fin_contrat) return false;
+        const dateFin = new Date(c.date_fin_contrat);
+        return dateFin > aujourdHui && dateFin <= dansTroisMois;
+      });
+
+      const totalActuel = contractuelsData.length;
+      const tauxTurnover = totalActuel > 0 
+        ? ((contratsExpires.length / totalActuel) * 100).toFixed(2)
+        : 0;
+
+      return {
+        periode: {
+          debut: ilYASixMois.toISOString().split('T')[0],
+          fin: aujourdHui.toISOString().split('T')[0]
+        },
+        effectif_actuel: totalActuel,
+        departs: contratsExpires.length,
+        arrivees: nouveauxContrats.length,
+        contrats_expirant_bientot: contratsExpirantBientot.length,
+        taux_turnover: parseFloat(tauxTurnover),
+        evolution: nouveauxContrats.length - contratsExpires.length
+      };
+    } catch (error) {
+      console.error('❌ Erreur getRapportTurnover:', error);
+      throw error;
+    }
+  },
+
+  async getRapportAbsences(params = {}) {
+    try {
+      console.log('📅 Génération rapport absences...');
+      const absences = await this.getAbsences(params);
+      const absencesData = absences.results || absences || [];
+
+      const parType = {};
+      absencesData.forEach(a => {
+        parType[a.type_absence] = (parType[a.type_absence] || 0) + 1;
+      });
+
+      const parStatut = {};
+      absencesData.forEach(a => {
+        parStatut[a.statut] = (parStatut[a.statut] || 0) + 1;
+      });
+
+      const totalJours = absencesData.reduce((sum, a) => {
+        if (a.date_debut && a.date_fin) {
+          const debut = new Date(a.date_debut);
+          const fin = new Date(a.date_fin);
+          const diffTime = Math.abs(fin - debut);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          return sum + diffDays;
+        }
+        return sum;
+      }, 0);
+
+      const absencesParMois = [];
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const moisStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        const absencesMois = absencesData.filter(a => {
+          if (!a.date_debut) return false;
+          const dateAbsence = new Date(a.date_debut);
+          return dateAbsence.toISOString().startsWith(moisStr);
+        });
+
+        absencesParMois.push({
+          mois: moisStr,
+          nom_mois: date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+          nombre: absencesMois.length,
+          jours: absencesMois.reduce((sum, a) => {
+            if (a.date_debut && a.date_fin) {
+              const debut = new Date(a.date_debut);
+              const fin = new Date(a.date_fin);
+              const diffTime = Math.abs(fin - debut);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+              return sum + diffDays;
+            }
+            return sum;
+          }, 0)
+        });
+      }
+
+      return {
+        total: absencesData.length,
+        total_jours: totalJours,
+        par_type: parType,
+        par_statut: parStatut,
+        par_mois: absencesParMois,
+        moyenne_jours_par_absence: absencesData.length > 0 
+          ? (totalJours / absencesData.length).toFixed(2)
+          : 0
+      };
+    } catch (error) {
+      console.error('❌ Erreur getRapportAbsences:', error);
+      throw error;
     }
   }
 };
